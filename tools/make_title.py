@@ -12,7 +12,7 @@ CSS = """
 /* title slide */
 .title-main { display: flex; flex-direction: column; justify-content: center; gap: 22px; flex: 1; min-height: 0; }
 .title-main h1 { font-size: 104px; white-space: nowrap; }
-.title-main .lead { font-size: 28px; max-width: none; }
+.title-main .lead { font-size: 26px; max-width: none; white-space: nowrap; }
 .title-main .rule { width: 72px; height: 5px; border-radius: 3px; background: var(--work); }
 .speaker { font-size: 22px; color: var(--muted); }
 .speaker b { color: var(--ink); font-size: 26px; }
@@ -33,18 +33,20 @@ for deck, kicker, note in [
   <div class="title-main">
     <div class="kicker">{kicker}</div>
     <h1>Chat with your Docs</h1>
-    <p class="lead">Build your first RAG system, one component at a time: watch it fail, play with it, then run the code.</p>
+    <p class="lead">Build your first RAG system, one component at a time: watch it fail, play with it, run the code.</p>
     <div class="rule"></div>
     <p class="speaker">with <b>{NAME}</b></p>
   </div>
-  <div class="banner"><span>▶ <b>Do this now:</b> <b>el-moghazy2.github.io/interactive-rag-from-scratch</b> → Open in Colab → <b>T4 GPU</b> → run <b>0 · Setup</b></span><span class="time">2 min, runs while we talk</span></div>
+  <div class="banner"><span>▶ <b>Do this now:</b> <b>el-moghazy2.github.io/interactive-rag-from-scratch</b> → Open in Colab → <b>T4 GPU</b> → run <b>0 · Setup</b></span><span class="time">2 min</span></div>
   <div class="title-foot"><span><kbd>→</kbd> next · <kbd>←</kbd> back · <kbd>O</kbd> all slides · <kbd>F</kbd> fullscreen · <kbd>T</kbd> theme</span><span>{note}</span></div>
 </section>''' + s[b:]
     s = re.sub(r'\?v=(\d+)"', lambda m: f'?v={int(m.group(1)) + 1}"', s)
     p.write_text(s, encoding="utf-8")
     c = ROOT / deck / "style.css"
     css = c.read_text(encoding="utf-8")
-    if "/* title slide */" in css:
-        css = css[:css.index("\n/* title slide */")]
+    if "/* title slide */" in css:              # replace only this block and keep whatever comes after it
+        x = css.index("\n/* title slide */")
+        y = css.find("\n/* ", x + 5)
+        css = css[:x] + (css[y:] if y > 0 else "")
     c.write_text(css + CSS, encoding="utf-8")
 print("title slide rebuilt in both decks")
