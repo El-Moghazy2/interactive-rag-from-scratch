@@ -37,7 +37,7 @@ for deck, kicker, note in [
     <div class="rule"></div>
     <p class="speaker">with <b>{NAME}</b></p>
   </div>
-  <div class="banner"><span>▶ <b>Do this now:</b> open <b>el-moghazy2.github.io/interactive-rag-from-scratch</b> → Open in Colab → Runtime → <b>T4 GPU</b> → run <b>0 · Setup</b></span><span class="time">2 min, runs while we talk</span></div>
+  <div class="banner"><span>▶ <b>Do this now:</b> <b>el-moghazy2.github.io/interactive-rag-from-scratch</b> → Open in Colab → <b>T4 GPU</b> → run <b>0 · Setup</b></span><span class="time">2 min, runs while we talk</span></div>
   <div class="title-foot"><span><kbd>→</kbd> next · <kbd>←</kbd> back · <kbd>O</kbd> all slides · <kbd>F</kbd> fullscreen · <kbd>T</kbd> theme</span><span>{note}</span></div>
 </section>''' + s[b:]
     s = re.sub(r'\?v=(\d+)"', lambda m: f'?v={int(m.group(1)) + 1}"', s)
