@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat with your Docs: build your first RAG</title>
+<link rel="stylesheet" href="style.css?v=57935">
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- ======================= START ======================= -->
+<section class="slide" id="title" data-part="0" style="gap:18px">
+  <div class="title-main">
+    <div class="kicker">Workshop · bring a laptop</div>
+    <h1>Chat with your Docs</h1>
+    <p class="lead">Build your first RAG system, one component at a time: watch it fail, play with it, then run the code.</p>
+    <div class="rule"></div>
+    <p class="speaker">with <b>Abdelrhman ElMoghazy</b></p>
+  </div>
+  <div class="banner"><span>▶ <b>Do this now:</b> open <b>el-moghazy2.github.io/interactive-rag-from-scratch</b> → Open in Colab → Runtime → <b>T4 GPU</b> → run <b>0 · Setup</b></span><span class="time">2 min, runs while we talk</span></div>
+  <div class="title-foot"><span><kbd>→</kbd> next · <kbd>←</kbd> back · <kbd>O</kbd> all slides · <kbd>F</kbd> fullscreen · <kbd>T</kbd> theme</span><span></span></div>
+</section>
+
+<!-- ======================= 1 · THE IDEA ======================= -->
+<section class="slide" id="ask" data-part="1">
+  <div class="kicker"><b>1</b> · The idea · watch it fail</div>
+  <h2>Ask a model about a document it has never read</h2>
+  <div class="col grow" style="gap:12px">
+    <div class="bubble q">Can I retake an exam I failed? <span style="opacity:.6">(I study at Moghazy University)</span></div>
+    <div class="bubble a" data-step="1" id="ask-answer" style="font-size:17px"></div>
+    <div class="card hit" data-step="2" style="font-size:18px"><span class="tag hit">What the handbook really says</span><br>
+      A student who does not pass a final assessment may attempt it again <b>once</b>, during the <b>August resit period</b>. The grade for a repeated attempt is <b>capped at C</b>, and a third attempt is not permitted.</div>
+  </div>
+  <p class="small" data-step="2">Fluent and confident, but none of it comes from our handbook. The model was never given it. (Answer recorded from gemma3:4b.)</p>
+</section>
+
+<section class="slide" id="openbook" data-part="1">
+  <div class="kicker"><b>1</b> · The idea</div>
+  <h2>Closed-book exam vs open-book exam</h2>
+  <div class="cols2" style="align-items:stretch;margin-top:10px">
+    <div class="card bad" data-step="1"><span class="tag bad">Closed book</span>
+      <h3>The model alone</h3><p>Answers from memory. It has never seen your handbook, your notes or last week's news, so it guesses in a confident voice.</p></div>
+    <div class="card hit" data-step="2"><span class="tag hit">Open book</span>
+      <h3>The model + the right page</h3><p>Before answering, we look up the relevant page and put it on the desk. Now it only has to read and explain.</p></div>
+  </div>
+  <div class="card res" data-step="3" style="margin-top:auto;font-size:25px"><b>R</b>etrieval-<b>A</b>ugmented <b>G</b>eneration: <b>retrieve</b> the right pieces of your documents, <b>augment</b> the prompt with them, let the model <b>generate</b> the answer.</div>
+</section>
+
+<section class="slide" id="pipeline" data-part="1">
+  <div class="kicker"><b>1</b> · The idea</div>
+  <h2>The whole system on one slide</h2>
+  <div class="grow">
+    <svg class="pipe" id="pipe-svg" viewBox="0 0 1160 410">
+      <g class="band ret"><rect x="8" y="10" width="588" height="390" rx="16"/><text x="24" y="34">RETRIEVAL</text></g>
+      <g class="band aug"><rect x="616" y="216" width="184" height="184" rx="16"/><text x="632" y="240">AUGMENTATION</text></g>
+      <g class="band gen"><rect x="820" y="216" width="332" height="184" rx="16"/><text x="836" y="240">GENERATION</text></g>
+      <text class="lane" x="130" y="34">INDEXING · once, ahead of time</text>
+      <path class="lanesplit" d="M24 212H580"/>
+      <text class="lane" x="24" y="236">SEARCH · for every question</text>
+      <path class="edge" data-at="1" d="M126 88H187m-8 -6l8 6l-8 6"/>
+      <path class="edge" data-at="2" d="M271 88H322m-8 -6l8 6l-8 6"/>
+      <path class="edge" data-at="2" d="M426 88H461m-8 -6l8 6l-8 6"/>
+      <path class="edge" data-at="4" d="M519 176V250m-6 -8l6 8l6 -8"/>
+      <path class="edge" data-at="3" d="M156 300H210m-8 -6l8 6l-8 6"/>
+      <path class="edge" data-at="4" d="M314 300H461m-8 -6l8 6l-8 6"/>
+      <path class="edge" data-at="5" d="M577 300H666m-8 -6l8 6l-8 6"/>
+      <path class="edge" data-at="6" d="M750 300H856m-8 -6l8 6l-8 6"/>
+      <path class="edge" data-at="6" d="M952 300H998m-8 -6l8 6l-8 6"/>
+      <g class="stage" data-at="1"><g transform="translate(9 -8)"><rect class="pg" x="55.0" y="50.0" width="58" height="76" rx="5"/><path class="tl" d="M64.0 64.0h40"/><path class="tl" d="M64.0 74.0h40"/><path class="tl" d="M64.0 84.0h26"/><path class="tl" d="M64.0 94.0h40"/><path class="tl" d="M64.0 104.0h40"/><path class="tl" d="M64.0 114.0h26"/></g><rect class="pg" x="55.0" y="50.0" width="58" height="76" rx="5"/><path class="tl" d="M64.0 64.0h40"/><path class="tl" d="M64.0 74.0h40"/><path class="tl" d="M64.0 84.0h26"/><path class="tl" d="M64.0 94.0h40"/><path class="tl" d="M64.0 104.0h40"/><path class="tl" d="M64.0 114.0h26"/><text class="t" x="84" y="150">Documents</text><text class="sub" x="84" y="169">the handbook</text></g>
+      <g class="stage" data-at="1"><rect x="200" y="50" width="58" height="16" rx="4" fill="#f3c766"/><path class="tl dark" d="M207 58h44"/><rect x="200" y="70" width="58" height="16" rx="4" fill="#6fcabb"/><path class="tl dark" d="M207 78h36"/><rect x="200" y="90" width="58" height="16" rx="4" fill="#9d90ee"/><path class="tl dark" d="M207 98h44"/><rect x="200" y="110" width="58" height="16" rx="4" fill="#ee8fa0"/><path class="tl dark" d="M207 118h36"/><text class="t" x="229" y="150">Chunks</text><text class="sub" x="229" y="169">cut into pieces</text></g>
+      <g class="stage" data-at="2"><rect x="336.5" y="53.5" width="9" height="9" rx="2" fill="#f3c766" opacity="0.9"/><rect x="347.5" y="53.5" width="9" height="9" rx="2" fill="#f3c766" opacity="0.3"/><rect x="358.5" y="53.5" width="9" height="9" rx="2" fill="#f3c766" opacity="0.6"/><rect x="369.5" y="53.5" width="9" height="9" rx="2" fill="#f3c766" opacity="1"/><rect x="380.5" y="53.5" width="9" height="9" rx="2" fill="#f3c766" opacity="0.45"/><rect x="391.5" y="53.5" width="9" height="9" rx="2" fill="#f3c766" opacity="0.75"/><rect x="402.5" y="53.5" width="9" height="9" rx="2" fill="#f3c766" opacity="0.25"/><rect x="336.5" y="73.5" width="9" height="9" rx="2" fill="#6fcabb" opacity="0.4"/><rect x="347.5" y="73.5" width="9" height="9" rx="2" fill="#6fcabb" opacity="0.95"/><rect x="358.5" y="73.5" width="9" height="9" rx="2" fill="#6fcabb" opacity="0.3"/><rect x="369.5" y="73.5" width="9" height="9" rx="2" fill="#6fcabb" opacity="0.6"/><rect x="380.5" y="73.5" width="9" height="9" rx="2" fill="#6fcabb" opacity="0.8"/><rect x="391.5" y="73.5" width="9" height="9" rx="2" fill="#6fcabb" opacity="0.2"/><rect x="402.5" y="73.5" width="9" height="9" rx="2" fill="#6fcabb" opacity="0.7"/><rect x="336.5" y="93.5" width="9" height="9" rx="2" fill="#9d90ee" opacity="0.7"/><rect x="347.5" y="93.5" width="9" height="9" rx="2" fill="#9d90ee" opacity="0.5"/><rect x="358.5" y="93.5" width="9" height="9" rx="2" fill="#9d90ee" opacity="1"/><rect x="369.5" y="93.5" width="9" height="9" rx="2" fill="#9d90ee" opacity="0.25"/><rect x="380.5" y="93.5" width="9" height="9" rx="2" fill="#9d90ee" opacity="0.55"/><rect x="391.5" y="93.5" width="9" height="9" rx="2" fill="#9d90ee" opacity="0.9"/><rect x="402.5" y="93.5" width="9" height="9" rx="2" fill="#9d90ee" opacity="0.35"/><rect x="336.5" y="113.5" width="9" height="9" rx="2" fill="#ee8fa0" opacity="0.3"/><rect x="347.5" y="113.5" width="9" height="9" rx="2" fill="#ee8fa0" opacity="0.65"/><rect x="358.5" y="113.5" width="9" height="9" rx="2" fill="#ee8fa0" opacity="0.45"/><rect x="369.5" y="113.5" width="9" height="9" rx="2" fill="#ee8fa0" opacity="0.85"/><rect x="380.5" y="113.5" width="9" height="9" rx="2" fill="#ee8fa0" opacity="1"/><rect x="391.5" y="113.5" width="9" height="9" rx="2" fill="#ee8fa0" opacity="0.5"/><rect x="402.5" y="113.5" width="9" height="9" rx="2" fill="#ee8fa0" opacity="0.6"/><text class="t" x="374" y="150">Embeddings</text><text class="sub" x="374" y="169">chunk → numbers</text></g>
+      <g class="stage" data-at="2"><rect class="box" x="469" y="46" width="100" height="84" rx="10"/><circle cx="489" cy="68" r="4.5" fill="#f3c766"/><circle cx="497" cy="80" r="4.5" fill="#f3c766"/><circle cx="485" cy="84" r="4.5" fill="#f3c766"/><circle cx="501" cy="64" r="4.5" fill="#f3c766"/><circle cx="533" cy="66" r="4.5" fill="#6fcabb"/><circle cx="545" cy="74" r="4.5" fill="#6fcabb"/><circle cx="539" cy="60" r="4.5" fill="#6fcabb"/><circle cx="551" cy="62" r="4.5" fill="#6fcabb"/><circle cx="511" cy="104" r="4.5" fill="#9d90ee"/><circle cx="525" cy="110" r="4.5" fill="#9d90ee"/><circle cx="517" cy="116" r="4.5" fill="#9d90ee"/><circle cx="533" cy="100" r="4.5" fill="#9d90ee"/><circle cx="545" cy="112" r="4.5" fill="#ee8fa0"/><circle cx="553" cy="102" r="4.5" fill="#ee8fa0"/><text class="t" x="519" y="150">Index</text><text class="sub" x="519" y="169">grouped by meaning</text></g>
+      <g class="stage" data-at="3"><path class="qb" d="M40.0 269.0h104a10 10 0 0 1 10 10v34a10 10 0 0 1 -10 10h-80l-12 12v-12h-12a10 10 0 0 1 -10 -10v-34a10 10 0 0 1 10 -10z"/><text class="bt" x="92" y="301">Can I retake…?</text><text class="t" x="92" y="362">Question</text><text class="sub" x="92" y="381">from a student</text></g>
+      <g class="stage" data-at="3"><rect x="224.5" y="295.5" width="9" height="9" rx="2" fill="var(--bad)" opacity="0.7"/><rect x="235.5" y="295.5" width="9" height="9" rx="2" fill="var(--bad)" opacity="0.5"/><rect x="246.5" y="295.5" width="9" height="9" rx="2" fill="var(--bad)" opacity="1"/><rect x="257.5" y="295.5" width="9" height="9" rx="2" fill="var(--bad)" opacity="0.25"/><rect x="268.5" y="295.5" width="9" height="9" rx="2" fill="var(--bad)" opacity="0.55"/><rect x="279.5" y="295.5" width="9" height="9" rx="2" fill="var(--bad)" opacity="0.9"/><rect x="290.5" y="295.5" width="9" height="9" rx="2" fill="var(--bad)" opacity="0.35"/><text class="t" x="262" y="362">Embed it</text><text class="sub" x="262" y="381">same model</text></g>
+      <g class="stage" data-at="4"><rect class="box" x="469" y="258" width="100" height="84" rx="10"/><path class="hitline" d="M521 306L511 316"/><path class="hitline" d="M521 306L525 322"/><path class="hitline" d="M521 306L533 312"/><circle cx="489" cy="280" r="4.5" fill="#f3c766"/><circle cx="497" cy="292" r="4.5" fill="#f3c766"/><circle cx="485" cy="296" r="4.5" fill="#f3c766"/><circle cx="501" cy="276" r="4.5" fill="#f3c766"/><circle cx="533" cy="278" r="4.5" fill="#6fcabb"/><circle cx="545" cy="286" r="4.5" fill="#6fcabb"/><circle cx="539" cy="272" r="4.5" fill="#6fcabb"/><circle cx="551" cy="274" r="4.5" fill="#6fcabb"/><circle cx="511" cy="316" r="6" fill="#9d90ee" class="hitdot"/><circle cx="525" cy="322" r="6" fill="#9d90ee" class="hitdot"/><circle cx="517" cy="328" r="4.5" fill="#9d90ee"/><circle cx="533" cy="312" r="6" fill="#9d90ee" class="hitdot"/><circle cx="545" cy="324" r="4.5" fill="#ee8fa0"/><circle cx="553" cy="314" r="4.5" fill="#ee8fa0"/><path class="qmark" d="M521.0 297.0L523.4 302.8L529.6 303.2L524.8 307.2L526.3 313.3L521.0 310.0L515.7 313.3L517.2 307.2L512.4 303.2L518.6 302.8Z"/><text class="t" x="519" y="362">Search</text><text class="sub" x="519" y="381">nearest chunks win</text></g>
+      <g class="stage" data-at="5"><rect class="pg" x="675" y="256" width="66" height="88" rx="6"/><rect x="682" y="263" width="52" height="12" rx="3" fill="var(--muted)" opacity=".55"/><rect x="682" y="280" width="52" height="12" rx="3" fill="#9d90ee"/><rect x="682" y="295" width="52" height="12" rx="3" fill="#9d90ee"/><rect x="682" y="310" width="52" height="12" rx="3" fill="#9d90ee"/><rect x="682" y="325" width="52" height="12" rx="3" fill="var(--bad)"/><text class="t" x="708" y="362">Prompt</text><text class="sub" x="708" y="381">rules + chunks + question</text></g>
+      <g class="stage" data-at="6"><path class="pin" d="M862 280h8M938 280h8M884 258v8M884 334v8"/><path class="pin" d="M862 300h8M938 300h8M904 258v8M904 334v8"/><path class="pin" d="M862 320h8M938 320h8M924 258v8M924 334v8"/><rect class="chip" x="870" y="266" width="68" height="68" rx="12"/><text class="ct" x="904" y="307">LLM</text><text class="t" x="904" y="362">Model</text><text class="sub" x="904" y="381">reads, then writes</text></g>
+      <g class="stage final" data-at="6"><path class="ab" d="M1012.0 265.0h104a10 10 0 0 1 10 10v42a10 10 0 0 1 -10 10h-80l-12 12v-12h-12a10 10 0 0 1 -10 -10v-42a10 10 0 0 1 10 -10z"/><path class="tl dark" d="M1016 280h96M1016 292h80M1016 304h52"/><rect x="1074" y="296" width="38" height="15" rx="4" fill="#9d90ee"/><text class="cite" x="1093" y="307">[c20]</text><text class="t" x="1064" y="362">Answer</text><text class="sub" x="1064" y="381">with its source</text></g>
+    </svg>
+  </div>
+  <div class="caps" style="font-size:22px;min-height:64px">
+    <p data-only="0" class="on">Two lanes. Press <kbd>→</kbd> to walk through them.</p>
+    <p data-only="1"><b>Chunking.</b> Cut the documents into pieces small enough to send to a model.</p>
+    <p data-only="2"><b>Embedding + indexing.</b> Turn each piece into numbers that capture its meaning, and store them so they are quick to search.</p>
+    <p data-only="3">A question arrives. We turn it into numbers with the <b>same</b> embedding model.</p>
+    <p data-only="4"><b>Retrieval.</b> Find the chunks whose numbers are closest to the question's.</p>
+    <p data-only="5"><b>Augmentation.</b> Paste those chunks into the prompt, next to the question.</p>
+    <p data-only="6"><b>Generation.</b> The model answers from what is on its desk. Today you build every box.</p>
+  </div>
+</section>
+
+<section class="slide" id="colab1" data-part="1" style="justify-content:center">
+  <div class="kicker"><b>1</b> · Your turn</div>
+  <h2>See both versions with your own eyes</h2>
+  <ul class="big-list" style="margin:14px 0">
+    <li>Run the <b>Part 1</b> cells: ask the model with no documents.</li>
+    <li>Run the next cell: the same question with the right paragraph pasted in by hand.</li>
+    <li>Compare the two answers with your neighbour's. Did the first ones even agree?</li>
+  </ul>
+  <p class="lead">Pasting by hand works for one question. The rest of today is about finding the right paragraph automatically.</p>
+  <div class="banner"><span>▶ <b>Colab · Part 1</b> run the two cells and compare the answers</span><span class="time">3 min</span></div>
+</section>
+
+<!-- ======================= 2 · CHUNKING ======================= -->
+<section class="slide" id="map-2" data-part="2" data-focus="1">
+  <div class="kicker"><b>2</b> · Chunking · where we are</div>
+  <h2>Step 1 of 5: cut the documents into chunks</h2>
+  <div class="grow mapholder"></div>
+  <p style="font-size:22px">Everything downstream works on chunks, so this first cut decides what can be found later.</p>
+</section>
+
+<section class="slide" id="chunk-why" data-part="2">
+  <div class="kicker"><b>2</b> · Chunking · watch it fail</div>
+  <h2>Why not paste the whole handbook into every prompt?</h2>
+  <ul class="big-list grow" style="margin-top:14px">
+    <li data-step="1"><b>It may not fit.</b> Ours is 4 pages. A real handbook is 300, a company wiki is millions.</li>
+    <li data-step="2"><b>You pay and wait for every word, on every question.</b> Even when the answer is one sentence.</li>
+    <li data-step="3"><b>Needles get lost in haystacks.</b> The more unrelated text around the answer, the more often models miss it.</li>
+  </ul>
+  <div class="card work" data-step="4"><span class="tag work">Predict</span><br>So we cut the document into <b>chunks</b> and send only the useful ones. How big should a chunk be: a sentence, a paragraph, a page? What goes wrong at each extreme?</div>
+</section>
+
+<section class="slide" id="chunk-demo" data-part="2">
+  <div class="kicker"><b>2</b> · Chunking · play</div>
+  <h2>Move the sliders. When does the late-work rule get cut in two?</h2>
+  <div class="grow" id="chunk-root"></div>
+  <p class="small">Each colour is one chunk. Striped text belongs to two chunks (the overlap). Try: size 150 with overlap 0, then raise the overlap, then switch to paragraphs.</p>
+</section>
+
+<section class="slide" id="chunk-rec" data-part="2" style="gap:11px">
+  <div class="kicker"><b>2</b> · Chunking · a smarter cut</div>
+  <h2>Recursive splitting: cut at the biggest natural break that fits</h2>
+  <div class="controls">
+    <label>maximum chunk size <input type="range" id="rc-size" min="80" max="400" step="20" value="200"><output id="rc-size-o"></output></label>
+    <button class="btn go" id="rc-play">▶ Play</button>
+    <button class="btn" id="rc-step">Step</button>
+    <button class="btn" id="rc-reset">Reset</button>
+    <span class="recrow" id="rc-ladder" style="margin-left:auto"></span>
+  </div>
+  <div class="recdemo grow">
+    <div class="panel"><div class="rctext" id="rc-text"></div></div>
+    <div class="panel col" style="gap:6px"><h3 id="rc-title"></h3><div class="rclist" id="rc-list"></div></div>
+  </div>
+  <div class="card" id="rc-cap" style="font-size:18.5px;padding:10px 16px;min-height:66px;transition:all .3s"></div>
+</section>
+
+<section class="slide" id="chunk-code" data-part="2">
+  <div class="kicker"><b>2</b> · Chunking · code</div>
+  <h2>Recursive splitting is one library call</h2>
+<pre class="code" data-hl="1:1;2:5-6;3:7;4:8;5:10" style="font-size:17px">
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def make_splitter(size=300, overlap=50):
+    return RecursiveCharacterTextSplitter(
+        chunk_size=size,                    # the longest a chunk may be, in characters
+        chunk_overlap=overlap,              # how much two neighbours share
+        separators=["\n\n", "\n", ". ", " ", ""],   # biggest break first
+        keep_separator="end")               # a full stop stays with its sentence
+
+pieces = make_splitter(200, 0).split_text(text)
+</pre>
+  <div class="caps card" style="min-height:104px">
+    <p data-only="0" class="on">Press <kbd>→</kbd> to step through the code.</p>
+    <p data-only="1"><b>The library.</b> LangChain ships the algorithm you just watched. You do not write the splitting yourself.</p>
+    <p data-only="2"><b>Size and overlap.</b> The same two dials as in the first demo: the most characters a chunk may hold, and how much two neighbours repeat.</p>
+    <p data-only="3"><b>The separators.</b> The list from the demo, from the biggest break to the smallest: blank line, line break, full stop, space, and finally "anywhere".</p>
+    <p data-only="4"><b>Where the separator goes.</b> <span class="mono">"end"</span> keeps each full stop attached to the sentence before it, so chunks do not start with a stray dot.</p>
+    <p data-only="5"><b>Use it.</b> A list of strings comes back. In Part 7 your own PDF is cut with this function.</p>
+  </div>
+</section>
+
+<section class="slide" id="chunk-quiz" data-part="2">
+  <div class="kicker"><b>2</b> · Chunking · check</div>
+  <h2>Quick check</h2>
+  <div class="quiz grow" data-answer="1">
+    <p class="q">Your chunks are 2,000 characters long. Answers come back vague and mix several unrelated rules. What do you try first?</p>
+    <div class="opts"><button>Even bigger chunks</button><button>Smaller chunks, split at paragraph boundaries</button><button>A bigger language model</button><button>Remove the overlap</button></div>
+    <p class="explain">A big chunk carries several topics at once, so it matches many questions weakly and fills the prompt with noise. Chunks that hold one idea each are easier to find and easier to use.</p>
+  </div>
+  <div class="banner"><span>▶ <b>Colab · Part 2</b> run the cells: fixed size first, then the recursive splitter, then build the chunks</span><span class="time">5 min</span></div>
+</section>
+
+<!-- ======================= 3 · EMBEDDINGS ======================= -->
+<section class="slide" id="map-3" data-part="3" data-focus="2">
+  <div class="kicker"><b>3</b> · Embeddings · where we are</div>
+  <h2>Step 2 of 5: turn text into numbers</h2>
+  <div class="grow mapholder"></div>
+  <p style="font-size:22px">The same embedding model is used twice: once for every chunk ahead of time, and once for each question.</p>
+</section>
+
+<section class="slide" id="emb-why" data-part="3">
+  <div class="kicker"><b>3</b> · Embeddings · watch it fail</div>
+  <h2>Matching words is not matching meaning</h2>
+  <div class="cols2" style="font-size:20px">
+    <div class="card"><span class="tag">Question</span><br>Can I <u>retake</u> an <u>exam</u> I <u>failed</u>?</div>
+    <div class="card"><span class="tag">The right chunk</span><br>A student who does <u>not pass</u> a <u>final assessment</u> may <u>attempt it again</u> once, during the August <u>resit</u> period…</div>
+  </div>
+  <p data-step="1">Not one important word in common. Here is what a word search returns for this question:</p>
+  <div class="rank" id="why-kw" data-step="1" style="max-width:820px"></div>
+  <p data-step="2" id="why-kw-note"></p>
+  <div class="card work" data-step="3" style="margin-top:auto"><span class="tag work">The idea</span><br>We need to compare <b>meaning</b>, not spelling. So we turn every text into numbers that capture what it means.</div>
+</section>
+
+<section class="slide" id="emb-idea" data-part="3" data-steps="1">
+  <div class="kicker"><b>3</b> · Embeddings · the idea</div>
+  <h2>One query, six sentences: which are closest in meaning?</h2>
+  <div class="demo split grow" style="grid-template-columns:1.2fr 1fr">
+    <div class="col" style="gap:10px">
+      <div class="chips" id="sim-chips"></div>
+      <div class="card" style="padding:10px 16px"><span class="tag res">Query</span> <b id="sim-query" style="font-size:22px"></b>
+        <div id="sim-vec" style="margin-top:8px"></div>
+        <p class="small" style="font-size:14px;margin-top:4px">An embedding model turns the text into a list of 384 numbers. Every sentence below gets its own list.</p></div>
+      <div class="col grow" id="sim-rows" style="gap:7px"></div>
+    </div>
+    <div class="panel col">
+      <h3>Each text is a direction. Compare by angle.</h3>
+      <svg id="sim-fan" viewBox="0 0 420 400" style="width:100%;flex:1;min-height:0"></svg>
+      <p class="small" id="sim-note">cosine similarity = cos(angle). Same direction → 1, unrelated → near 0.</p>
+    </div>
+  </div>
+  <div class="caps small" style="font-size:18px">
+    <p data-only="0" class="on"><b>Predict:</b> rank the six sentences from closest to furthest. Then press <kbd>→</kbd>.</p>
+    <p data-only="1">Real scores from all-MiniLM-L6-v2. Hover a sentence to find its arrow. Note the ones that share a word with the query but not its meaning.</p>
+  </div>
+</section>
+
+<section class="slide" id="emb-demo" data-part="3" data-steps="1">
+  <div class="kicker"><b>3</b> · Embeddings · play</div>
+  <h2>All 47 chunks on a map. Where does your question land?</h2>
+  <div class="demo split grow">
+    <div class="panel"><svg class="map" id="emb-map"></svg></div>
+    <div class="col" style="min-height:0">
+      <div id="emb-q"></div>
+      <div class="rank" id="emb-rank"></div>
+      <div class="panel grow"><h3>Chunk text</h3><p class="hover-text" id="emb-hover">Hover a dot to read it. Which dots sit close together?</p></div>
+    </div>
+  </div>
+  <p class="small">The map squeezes 384 dimensions into 2, so distances on screen are approximate. The scores on the right are the real cosine similarities.</p>
+</section>
+
+<section class="slide" id="emb-code" data-part="3">
+  <div class="kicker"><b>3</b> · Embeddings · code</div>
+  <h2>Embed once, compare with a dot product</h2>
+<pre class="code" data-hl="1:1-2;2:4-5;3:7-8">
+from sentence_transformers import SentenceTransformer
+embedder = SentenceTransformer("all-MiniLM-L6-v2")     # small, free, runs on a laptop
+
+def cosine(a, b):
+    return a @ b / (np.linalg.norm(a) * np.linalg.norm(b))
+
+emb = embedder.encode(texts, normalize_embeddings=True)
+emb.shape                                              # (47, 384)
+</pre>
+  <div class="caps card" style="min-height:120px">
+    <p data-only="0" class="on">Press <kbd>→</kbd> to step through the code.</p>
+    <p data-only="1"><b>The model.</b> The same one that drew the map on the last slide. It is 90 MB and needs no API key.</p>
+    <p data-only="2"><b>Cosine similarity.</b> The dot product <span class="mono">a @ b</span> divided by both lengths <span class="mono">np.linalg.norm(a)</span>, <span class="mono">np.linalg.norm(b)</span>.</p>
+    <p data-only="3"><b>Embed every chunk once.</b> One row per chunk. <span class="mono">normalize_embeddings=True</span> makes every length 1, so from here on cosine similarity is a plain dot product. That is what the vector index in the next part computes.</p>
+  </div>
+</section>
+
+<section class="slide" id="emb-quiz" data-part="3">
+  <div class="kicker"><b>3</b> · Embeddings · check</div>
+  <h2>Quick check</h2>
+  <div class="quiz grow" data-answer="2">
+    <p class="q">Two texts have a cosine similarity of 0.9. What does that tell you?</p>
+    <div class="opts"><button>They share 90% of their words</button><button>One is the correct answer to the other</button><button>The model places their meanings very close together</button><button>They are about the same length</button></div>
+    <p class="explain">Similarity is about meaning as the model sees it. It says nothing about shared words, length or truth: a question and a wrong answer on the same topic also score high. That is why generation still has to read carefully.</p>
+  </div>
+  <div class="banner"><span>▶ <b>Colab · Part 3</b> run the cells: one embedding, cosine similarity, then embed every chunk</span><span class="time">5 min</span></div>
+</section>
+
+<!-- ======================= 4 · INDEX ======================= -->
+<section class="slide" id="map-4" data-part="4" data-focus="3">
+  <div class="kicker"><b>4</b> · Vector index · where we are</div>
+  <h2>Step 3 of 5: store the numbers so they are fast to search</h2>
+  <div class="grow mapholder"></div>
+  <p style="font-size:22px">Built once, ahead of time. Every question will look things up in it.</p>
+</section>
+
+<section class="slide" id="idx-why" data-part="4">
+  <div class="kicker"><b>4</b> · Vector index · watch it fail</div>
+  <h2>Comparing with everything does not scale</h2>
+  <div class="row grow" style="align-items:stretch;margin-top:8px">
+    <div class="card" style="flex:1"><span class="tag">Our handbook</span><div class="counter" style="margin:14px 0">47</div><p>comparisons per question. Instant.</p></div>
+    <div class="card bad" style="flex:1" data-step="1"><span class="tag bad">A university's documents</span><div class="counter" style="margin:14px 0">5,000,000</div><p>comparisons per question, for every student, all day.</p></div>
+    <div class="card hit" style="flex:1.2" data-step="2"><span class="tag hit">The trick</span><p style="margin-top:10px">Group similar vectors into <b>clusters</b> ahead of time. For a question, find the nearest cluster centres and search <b>only inside those</b>.</p><p class="small" style="margin-top:8px">Like going to the right shelf in a library instead of reading every spine.</p></div>
+  </div>
+  <div class="card work" data-step="3"><span class="tag work">Predict</span><br>We skip most of the vectors. Can this shortcut ever return the wrong chunk?</div>
+</section>
+
+<section class="slide" id="idx-demo" data-part="4">
+  <div class="kicker"><b>4</b> · Vector index · play</div>
+  <h2>Open fewer clusters: faster, but sometimes wrong</h2>
+  <div class="demo split grow">
+    <div class="panel"><svg class="map" id="idx-map"></svg></div>
+    <div class="col" style="min-height:0">
+      <div id="idx-q"></div>
+      <div class="controls"><label>clusters to open <input type="range" id="idx-np" min="1" max="6" value="1" style="width:120px"><output id="idx-np-o"></output></label><button class="btn go" id="idx-run">▶ Run</button></div>
+      <div class="row">
+        <div class="card" style="flex:1"><span class="small">Exact search</span><div class="counter" id="idx-exact"></div><span class="small">comparisons</span></div>
+        <div class="card work" style="flex:1"><span class="small">With the index</span><div class="counter" id="idx-ivf">0</div><span class="small">comparisons</span></div>
+      </div>
+      <div id="idx-out" class="grow"></div>
+    </div>
+  </div>
+  <p class="small">Colours are 6 clusters found in the real 384-dimensional space; diamonds are their centres. Try each question with 1 cluster, then 2.</p>
+</section>
+
+<section class="slide" id="idx-what" data-part="4" style="gap:14px">
+  <div class="kicker"><b>4</b> · Vector index · the kinds</div>
+  <h2>A vector index answers one question: which stored vectors are nearest?</h2>
+  <div class="cols3">
+    <div class="card" data-step="1"><svg viewBox="0 0 210 112" class="ixpic"><path class="ix-l" d="M122 70L30 25"/><path class="ix-l" d="M122 70L55 40"/><path class="ix-l" d="M122 70L40 72"/><path class="ix-l" d="M122 70L70 84"/><path class="ix-l" d="M122 70L95 30"/><path class="ix-l" d="M122 70L115 55"/><path class="ix-l" d="M122 70L100 88"/><path class="ix-l" d="M122 70L140 25"/><path class="ix-l" d="M122 70L160 50"/><path class="ix-l" d="M122 70L145 82"/><path class="ix-l" d="M122 70L176 76"/><path class="ix-l" d="M122 70L180 30"/><circle cx="30" cy="25" r="6" class="ix-d hot"/><circle cx="55" cy="40" r="6" class="ix-d hot"/><circle cx="40" cy="72" r="6" class="ix-d hot"/><circle cx="70" cy="84" r="6" class="ix-d hot"/><circle cx="95" cy="30" r="6" class="ix-d hot"/><circle cx="115" cy="55" r="6" class="ix-d hot"/><circle cx="100" cy="88" r="6" class="ix-d hot"/><circle cx="140" cy="25" r="6" class="ix-d hot"/><circle cx="160" cy="50" r="6" class="ix-d hot"/><circle cx="145" cy="82" r="6" class="ix-d hot"/><circle cx="176" cy="76" r="6" class="ix-d hot"/><circle cx="180" cy="30" r="6" class="ix-d hot"/><path class="ix-q" d="M122 59l3.2 7.2l7.8 .8l-5.8 5.3l1.6 7.7l-6.8 -3.9l-6.8 3.9l1.6 -7.7l-5.8 -5.3l7.8 -.8z"/></svg><h3>Flat</h3><p class="ixp">Compare with <b>every</b> vector. Always exact. Fine for thousands of chunks, and what your Colab uses.</p></div>
+    <div class="card" data-step="2"><svg viewBox="0 0 210 112" class="ixpic"><circle class="ix-c" cx="48" cy="55" r="40"/><circle class="ix-c on" cx="106" cy="60" r="38"/><circle class="ix-c" cx="161" cy="52" r="40"/><path class="ix-l" d="M122 70L95 30"/><path class="ix-l" d="M122 70L115 55"/><path class="ix-l" d="M122 70L100 88"/><circle cx="30" cy="25" r="6" class="ix-d dim"/><circle cx="55" cy="40" r="6" class="ix-d dim"/><circle cx="40" cy="72" r="6" class="ix-d dim"/><circle cx="70" cy="84" r="6" class="ix-d dim"/><circle cx="95" cy="30" r="6" class="ix-d hot"/><circle cx="115" cy="55" r="6" class="ix-d hot"/><circle cx="100" cy="88" r="6" class="ix-d hot"/><circle cx="140" cy="25" r="6" class="ix-d dim"/><circle cx="160" cy="50" r="6" class="ix-d dim"/><circle cx="145" cy="82" r="6" class="ix-d dim"/><circle cx="176" cy="76" r="6" class="ix-d dim"/><circle cx="180" cy="30" r="6" class="ix-d dim"/><path class="ix-q" d="M122 59l3.2 7.2l7.8 .8l-5.8 5.3l1.6 7.7l-6.8 -3.9l-6.8 3.9l1.6 -7.7l-5.8 -5.3l7.8 -.8z"/></svg><h3>Clusters (IVF)</h3><p class="ixp">Search only inside the <b>nearest clusters</b>. Much faster, can miss. The demo you just played.</p></div>
+    <div class="card" data-step="3"><svg viewBox="0 0 210 112" class="ixpic"><path class="ix-e on" d="M30 25L55 40"/><path class="ix-e" d="M55 40L40 72"/><path class="ix-e" d="M40 72L70 84"/><path class="ix-e on" d="M55 40L95 30"/><path class="ix-e on" d="M95 30L115 55"/><path class="ix-e" d="M115 55L100 88"/><path class="ix-e" d="M70 84L100 88"/><path class="ix-e" d="M95 30L140 25"/><path class="ix-e" d="M140 25L160 50"/><path class="ix-e" d="M160 50L145 82"/><path class="ix-e" d="M145 82L176 76"/><path class="ix-e" d="M160 50L180 30"/><path class="ix-e" d="M115 55L160 50"/><path class="ix-e" d="M100 88L145 82"/><circle cx="30" cy="25" r="6" class="ix-d hot"/><circle cx="55" cy="40" r="6" class="ix-d hot"/><circle cx="40" cy="72" r="6" class="ix-d dim"/><circle cx="70" cy="84" r="6" class="ix-d dim"/><circle cx="95" cy="30" r="6" class="ix-d hot"/><circle cx="115" cy="55" r="6" class="ix-d hot"/><circle cx="100" cy="88" r="6" class="ix-d dim"/><circle cx="140" cy="25" r="6" class="ix-d dim"/><circle cx="160" cy="50" r="6" class="ix-d dim"/><circle cx="145" cy="82" r="6" class="ix-d dim"/><circle cx="176" cy="76" r="6" class="ix-d dim"/><circle cx="180" cy="30" r="6" class="ix-d dim"/><path class="ix-q" d="M122 59l3.2 7.2l7.8 .8l-5.8 5.3l1.6 7.7l-6.8 -3.9l-6.8 3.9l1.6 -7.7l-5.8 -5.3l7.8 -.8z"/></svg><h3>Graph (HNSW)</h3><p class="ixp">Hop along <b>links between neighbours</b> toward the question. Fast and accurate, uses more memory. The default in most vector databases.</p></div>
+  </div>
+  <div data-step="4" class="col" style="gap:10px">
+<pre class="code" style="font-size:17.5px;padding:12px 0">
+index = faiss.IndexFlatIP(384)           # an empty index for 384-number vectors
+index.add(emb)                           # store every chunk's vector
+scores, ids = index.search(q, 3)         # ask for the 3 chunks nearest to the question
+</pre>
+    <p class="small">A vector database (Chroma, Qdrant, pgvector) is an index like these, plus storage on disk, filters and updates.</p>
+  </div>
+</section>
+
+<section class="slide" id="idx-code" data-part="4">
+  <div class="kicker"><b>4</b> · Vector index · code</div>
+  <h2>A real vector index in your pipeline</h2>
+<pre class="code" data-hl="1:1-2;2:5;3:6-7;4:9-11" style="font-size:17px">
+index = faiss.IndexFlatIP(emb.shape[1])        # an empty index for 384-number vectors
+index.add(emb)                                 # store every chunk's vector
+
+def semantic_search(question, k=3):
+    q = embedder.encode([question], normalize_embeddings=True)
+    scores, ids = index.search(q, k)           # ask the index
+    return [(int(i), float(s)) for i, s in zip(ids[0], scores[0]) if i >= 0]
+
+ivf = faiss.IndexIVFFlat(faiss.IndexFlatIP(384), 384, 6, faiss.METRIC_INNER_PRODUCT)
+ivf.train(emb); ivf.add(emb)                   # find 6 clusters, file every chunk
+ivf.nprobe = 2                                 # clusters to open per question
+</pre>
+  <div class="caps card" style="min-height:104px">
+    <p data-only="0" class="on">Press <kbd>→</kbd> to step through the code.</p>
+    <p data-only="1"><b>Build the index once.</b> A flat index compares with everything, so it is exact. "IP" is inner product, which equals cosine similarity because our vectors have length 1.</p>
+    <p data-only="2"><b>Embed the question</b> with the same model as the chunks. A different model would give numbers from a different space.</p>
+    <p data-only="3"><b>Ask the index.</b> It returns two arrays: the scores, and the positions of the nearest chunks. Every later part of your RAG searches through this function.</p>
+    <p data-only="4"><b>The shortcut at scale.</b> The same call on a clustered index; <span class="mono">nprobe</span> is the slider you just played with. Your pipeline keeps the exact index.</p>
+  </div>
+</section>
+
+<section class="slide" id="idx-quiz" data-part="4">
+  <div class="kicker"><b>4</b> · Vector index · check</div>
+  <h2>Quick check</h2>
+  <div class="quiz grow" data-answer="0">
+    <p class="q">With one cluster open, the index missed the best chunk. What is the cheapest fix?</p>
+    <div class="opts"><button>Open more clusters per question (raise nprobe)</button><button>Embed all documents again</button><button>Use a bigger language model</button><button>Make the chunks smaller</button></div>
+    <p class="explain">An index trades a little accuracy for a lot of speed, and nprobe is the dial. Nothing has to be rebuilt. With all clusters open you are back to exact search.</p>
+  </div>
+  <div class="banner"><span>▶ <b>Colab · Part 4</b> run the cells: build the index, search it, then try the clustered index</span><span class="time">5 min</span></div>
+</section>
+
+<!-- ======================= 5 · HYBRID ======================= -->
+<section class="slide" id="map-5" data-part="5" data-focus="4">
+  <div class="kicker"><b>5</b> · Hybrid search · where we are</div>
+  <h2>Step 4 of 5: find the right chunks for this question</h2>
+  <div class="grow mapholder"></div>
+  <p style="font-size:22px">This is the R in RAG. If the right chunk is not found here, nothing later can fix it.</p>
+</section>
+
+<section class="slide" id="hyb-why" data-part="5">
+  <div class="kicker"><b>5</b> · Hybrid search · watch it fail</div>
+  <h2>Now semantic search lets us down</h2>
+  <div class="bubble q" id="hyb-why-q" style="align-self:flex-start"></div>
+  <div data-step="1" class="col" style="gap:8px">
+    <p class="small">Semantic search, top 4:</p>
+    <div class="rank" id="hyb-why-rank" style="max-width:760px"></div>
+  </div>
+  <p data-step="2">To an embedding model, <span class="mono">CS-240</span> and <span class="mono">CS-204</span> both mean "some computer science course". Exact codes, names and numbers get blurred.</p>
+  <div class="card work" data-step="3" style="margin-top:auto"><span class="tag work">Predict</span><br>Old-fashioned keyword search would nail <span class="mono">CS-240</span>. But which search wins on "Can I retake an exam I failed?" And what if we used both?</div>
+</section>
+
+<section class="slide" id="hyb-demo" data-part="5" data-steps="1">
+  <div class="kicker"><b>5</b> · Hybrid search · play</div>
+  <h2>Keyword vs meaning vs both</h2>
+  <div id="hyb-q"></div>
+  <p class="small">Keywords the search sees: <span class="mono" id="hyb-tokens"></span></p>
+  <div class="cols3 grow">
+    <div class="panel"><h3>Keyword (BM25)</h3><div class="rank" id="hyb-kw"></div></div>
+    <div class="panel"><h3>Meaning (embeddings)</h3><div class="rank" id="hyb-sem"></div></div>
+    <div class="panel" style="border-color:var(--res)"><h3>Hybrid (rank fusion)</h3><div class="flip" id="hyb-fused"></div></div>
+  </div>
+  <div class="controls"><span>trust keywords</span><input type="range" id="hyb-mix" min="0" max="100" value="50" style="width:320px"><span>trust meaning</span><output id="hyb-mix-o" style="min-width:140px"></output>
+    <span class="small" style="margin-left:auto">Each search nominates its top 5; a chunk earns 1 / (60 + position) per list. Purple marks the right chunk.</span></div>
+</section>
+
+<section class="slide" id="hyb-code" data-part="5">
+  <div class="kicker"><b>5</b> · Hybrid search · code</div>
+  <h2>BM25 for keywords, rank fusion to combine</h2>
+<pre class="code" data-hl="1:1-2;2:6-7;3:8;4:9">
+bm25 = BM25Okapi([tokenize(t) for t in texts])        # count words in every chunk
+scores = bm25.get_scores(tokenize(question))          # rare matching words score high
+
+def rrf(rankings, k=60):
+    points = {}
+    for ranking in rankings:                          # one ranked list per search method
+        for rank, i in enumerate(ranking, start=1):
+            points[i] = points.get(i, 0) + 1 / (k + rank)
+    return sorted(points.items(), key=lambda item: -item[1])
+</pre>
+  <div class="caps card" style="min-height:110px">
+    <p data-only="0" class="on">Press <kbd>→</kbd> to step through the code.</p>
+    <p data-only="1"><b>BM25.</b> A chunk scores when it contains the question's words. A rare word such as <span class="mono">cs-240</span> counts far more than a common one such as <span class="mono">semester</span>.</p>
+    <p data-only="2"><b>Two lists in.</b> BM25 scores (0 to 10) and cosine scores (0 to 1) cannot be added. So we throw the scores away and keep only the positions.</p>
+    <p data-only="3"><b>Reciprocal rank fusion.</b> Position 1 earns 1/61, position 2 earns 1/62, and so on. A chunk that is near the top of both lists collects the most points.</p>
+    <p data-only="4"><b>Sort by points.</b> That is the whole algorithm, and it is what many production search systems use.</p>
+  </div>
+</section>
+
+<section class="slide" id="hyb-quiz" data-part="5">
+  <div class="kicker"><b>5</b> · Hybrid search · check</div>
+  <h2>Quick check</h2>
+  <div class="quiz grow" data-answer="1">
+    <p class="q">Users of a support bot paste error codes like "E-4012" and also describe problems in their own words. Which retrieval do you ship?</p>
+    <div class="opts"><button>Semantic only: it understands meaning</button><button>Hybrid: keywords catch the codes, embeddings catch the paraphrases</button><button>Keyword only: it is exact</button><button>No retrieval, a bigger model will know</button></div>
+    <p class="explain">Each method fails on the other's strength. Fusing the two rankings costs a few lines and covers both kinds of question.</p>
+  </div>
+  <div class="banner"><span>▶ <b>Colab · Part 5</b> run the cells and compare keyword, semantic and hybrid search</span><span class="time">6 min</span></div>
+</section>
+
+<!-- ======================= 6 · GENERATION ======================= -->
+<section class="slide" id="map-6" data-part="6" data-focus="5">
+  <div class="kicker"><b>6</b> · Generation · where we are</div>
+  <h2>Step 5 of 5: build the prompt and let the model answer</h2>
+  <div class="grow mapholder"></div>
+  <p style="font-size:22px">The A and the G: paste the retrieved chunks next to the question, then generate.</p>
+</section>
+
+<section class="slide" id="gen-why" data-part="6">
+  <div class="kicker"><b>6</b> · Generation · watch it fail</div>
+  <h2>The model can only be as good as what is on its desk</h2>
+  <div class="bubble q" style="align-self:flex-start">How much does a campus parking permit cost? <span style="opacity:.6">(the handbook never mentions parking)</span></div>
+  <div class="cols2" style="align-items:start">
+    <div class="card bad" data-step="1"><span class="tag bad">No retrieval</span><p class="answer" id="gen-why-loose" style="font-size:17px"></p></div>
+    <div class="card hit" data-step="2"><span class="tag hit">3 retrieved chunks + rules: only the context, say when you don't know</span><p class="answer" id="gen-why-strict" style="font-size:19px"></p></div>
+  </div>
+  <div class="card work" data-step="3"><span class="tag work">And when retrieval hands over the wrong chunk?</span>
+    <p style="font-size:18px">"Can I retake an exam I failed?" with only <b>one</b> retrieved chunk (the absence rule, not the resit rule):</p>
+    <p class="answer" id="gen-why-k1" style="font-size:18px;font-style:italic"></p></div>
+  <p class="small" data-step="3">All three answers recorded from gemma3:4b. It followed the rules faithfully, and was confidently wrong when given the wrong page.</p>
+</section>
+
+<section class="slide" id="gen-demo" data-part="6">
+  <div class="kicker"><b>6</b> · Generation · play</div>
+  <h2>Build the prompt, watch the answer change</h2>
+  <div id="gen-q"></div>
+  <div class="controls">
+    <label class="switch"><input type="checkbox" id="gen-ret" checked> retrieval on</label>
+    <label>chunks <select id="gen-k"><option>1</option><option selected>3</option><option>5</option></select></label>
+    <label class="switch"><input type="checkbox" id="gen-strict" checked> "only the context"</label>
+    <label class="switch"><input type="checkbox" id="gen-cite" checked> "cite your sources"</label>
+    <span class="small" id="gen-words" style="margin-left:auto"></span>
+  </div>
+  <div class="demo split grow">
+    <div class="panel"><h3>The prompt we send</h3><div class="prompt" id="gen-prompt" style="height:calc(100% - 26px)"></div></div>
+    <div class="panel" style="border-color:var(--res)"><h3>The model's answer (recorded, gemma3:4b)</h3><div class="answer" id="gen-answer" style="height:calc(100% - 26px)"></div></div>
+  </div>
+  <p class="small"><span class="prompt" style="font-size:14px"><span class="rule">rules</span> · <span class="ctx">retrieved chunks</span> · <span class="qq">question</span></span> &nbsp; Try: any question with retrieval off · "retake" with 1 chunk, then 3 · the rules off and on.</p>
+</section>
+
+<section class="slide" id="gen-code" data-part="6">
+  <div class="kicker"><b>6</b> · Generation · code</div>
+  <h2>The last two functions: your RAG is complete</h2>
+<pre class="code" data-hl="1:2;2:3-6;3:7-8;4:10-12" style="font-size:16.5px">
+def build_prompt(question, results):
+    context = "\n".join(f"[{chunks[i]['id']}] {chunks[i]['text']}" for i, _ in results)
+    return f"""You are a helpful assistant for Moghazy University students.
+Answer the question using ONLY the context below.
+If the answer is not in the context, say "I don't know based on the handbook."
+Cite the chunk ids you used in square brackets, like [c12].
+Context: {context}
+Question: {question}"""
+
+def rag(question, k=3):
+    results = hybrid_search(question, k)                 # retrieve
+    return ask_llm(build_prompt(question, results))      # augment + generate
+</pre>
+  <div class="caps card" style="min-height:92px">
+    <p data-only="0" class="on">Press <kbd>→</kbd> to step through the code.</p>
+    <p data-only="1"><b>Context.</b> One line per retrieved chunk, each starting with its id so the model can cite it.</p>
+    <p data-only="2"><b>Rules.</b> Stay inside the context, admit when the answer is missing, say where the answer came from.</p>
+    <p data-only="3"><b>The open book and the question.</b> This is the "augmented" in RAG: plain text pasted into a prompt.</p>
+    <p data-only="4"><b>Three lines for the whole system:</b> retrieve, augment, generate.</p>
+  </div>
+</section>
+
+<section class="slide" id="gen-quiz" data-part="6">
+  <div class="kicker"><b>6</b> · Generation · check</div>
+  <h2>Quick check</h2>
+  <div class="quiz grow" data-answer="3">
+    <p class="q">The answer is wrong. You print the retrieved chunks and the right one is there, at position 1. Where is the problem?</p>
+    <div class="opts"><button>Chunking</button><button>The embedding model</button><button>The vector index</button><button>Generation: the prompt or the model</button></div>
+    <p class="explain">Always look at the retrieved chunks first. Right chunk present: fix the prompt or the model. Right chunk missing: fix chunking or search. This one habit solves most RAG bugs.</p>
+  </div>
+  <div class="banner"><span>▶ <b>Colab · Part 6</b> run the cells: build the prompt, then ask all four questions</span><span class="time">6 min</span></div>
+</section>
+
+<!-- ======================= 7 · YOUR DOCS ======================= -->
+<section class="slide" id="clinic" data-part="7">
+  <div class="kicker"><b>7</b> · Failure clinic</div>
+  <h2>Three broken RAGs. Which part do you fix?</h2>
+  <div class="col grow" style="gap:10px">
+    <div class="card quiz mini" data-answer="0"><p class="q"><b>Case 1.</b> "What is the late penalty?" → "You lose 10% per day." It never mentions the zero after five days. The retrieved chunk ends in the middle of a sentence.</p>
+      <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">The fact was split across two chunks. Split at paragraph boundaries or add overlap.</p></div>
+    <div class="card quiz mini" data-answer="1"><p class="q"><b>Case 2.</b> "Which semester is CS-240 taught in?" → a confident answer about CS-204. The CS-240 chunk is not among the retrieved chunks.</p>
+      <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">The right chunk was never retrieved. Add keyword search and fuse the rankings.</p></div>
+    <div class="card quiz mini" data-answer="2"><p class="q"><b>Case 3.</b> "How much is a parking permit?" → "A permit costs 50 lumens per semester." The handbook has no parking section.</p>
+      <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">Nothing to retrieve, so the model filled the gap. Tell it to answer only from the context and to say when it does not know.</p></div>
+  </div>
+</section>
+
+<section class="slide" id="yours" data-part="7" style="justify-content:center">
+  <div class="kicker"><b>7</b> · Your turn</div>
+  <h2>Now chat with your own document</h2>
+  <ul class="big-list" style="margin:14px 0">
+    <li>Upload any text PDF: a course syllabus, lecture notes, a paper.</li>
+    <li>The notebook cuts it with the recursive splitter, embeds it and rebuilds both indexes.</li>
+    <li>Ask it three things: one easy, one with an exact name or number, one it cannot know.</li>
+    <li>When an answer is wrong, print the retrieved chunks and name the broken part.</li>
+  </ul>
+  <div class="banner"><span>▶ <b>Colab · Part 7</b> upload a PDF and start the chat loop</span><span class="time">8 min</span></div>
+</section>
+
+<section class="slide" id="recap" data-part="7">
+  <div class="kicker"><b>7</b> · Recap</div>
+  <h2>You built every box</h2>
+  <div id="recap-pipe" style="height:330px"></div>
+  <div class="row" style="font-size:18px">
+    <div class="card" style="flex:1"><b>Reranking</b><br><span class="small">Retrieve 20, let a stronger model pick the best 3.</span></div>
+    <div class="card" style="flex:1"><b>Evaluation</b><br><span class="small">20 questions with known answers; how often is the right chunk in the top 3?</span></div>
+    <div class="card" style="flex:1"><b>Vector databases</b><br><span class="small">Chroma, Qdrant, pgvector: the same index, kept on disk.</span></div>
+    <div class="card" style="flex:1"><b>Agentic search</b><br><span class="small">Let the model decide what to look up, and when.</span></div>
+  </div>
+</section>
+
+<!-- ======================= 8 · RAG VS LONG CONTEXT ======================= -->
+<section class="slide" id="lc-question" data-part="8">
+  <div class="kicker"><b>8</b> · RAG vs long context</div>
+  <h2>Some models now read a million tokens at once. Is RAG still needed?</h2>
+  <div class="cols2" style="align-items:stretch;margin-top:10px">
+    <div class="card hit"><span class="tag hit">RAG</span><h3>Select, then read</h3>
+      <p>Chunk, embed, index, search. Send the model a few passages.</p>
+      <p class="small" style="margin-top:8px">What you built today.</p></div>
+    <div class="card work" data-step="1"><span class="tag work">Long context</span><h3>Read everything, every time</h3>
+      <p>No chunks, no embeddings, no index. Paste all the documents into the prompt and let the model find the answer.</p>
+      <p class="small" style="margin-top:8px">A million tokens is roughly 700,000 words: several long novels.</p></div>
+  </div>
+  <div class="card" data-step="2" style="margin-top:auto">Our whole handbook is about 2,500 tokens. It fits in any model, hundreds of times over. So was today a waste? Two views coming up, then a calculator.</div>
+</section>
+
+<section class="slide" id="lc-debate" data-part="8">
+  <div class="kicker"><b>8</b> · RAG vs long context</div>
+  <h2>Three points each way</h2>
+  <div class="cols2 grow" style="align-items:start">
+    <div class="col">
+      <span class="tag work" style="align-self:flex-start">For long context</span>
+      <div class="card" data-step="1"><b>Far fewer moving parts.</b> <span class="small">No chunking strategy, embedding model, vector store or sync job to break.</span></div>
+      <div class="card" data-step="2"><b>No retrieval misses.</b> <span class="small">RAG can fail silently: the answer was in the data, but search never showed it to the model.</span></div>
+      <div class="card" data-step="3"><b>Whole-document questions.</b> <span class="small">"What is in the requirements but missing from the release notes?" needs both documents in full, not a few snippets.</span></div>
+    </div>
+    <div class="col">
+      <span class="tag hit" style="align-self:flex-start">For RAG</span>
+      <div class="card" data-step="4"><b>No re-reading.</b> <span class="small">Long context processes every document again on every question. RAG pays once, at indexing time. Caching helps when the documents rarely change.</span></div>
+      <div class="card" data-step="5"><b>Less noise.</b> <span class="small">Models can miss a detail buried deep inside a huge prompt. A handful of relevant chunks keeps the model on the signal.</span></div>
+      <div class="card" data-step="6"><b>Data bigger than any window.</b> <span class="small">A company's documents are measured in terabytes. Something has to choose what goes in.</span></div>
+    </div>
+  </div>
+  <p class="small">Summarised from Martin Keen, "Is RAG Still Needed? Choosing the Best Approach for LLMs", IBM Technology (YouTube, 2026).</p>
+</section>
+
+<section class="slide" id="lc-cache" data-part="8">
+  <div class="kicker"><b>8</b> · RAG vs long context · caching</div>
+  <h2>Prompt caching: the model skips what it has just read</h2>
+  <div class="cols2 grow" style="grid-template-columns:1.5fr 1fr;align-items:stretch">
+    <div class="panel col" style="gap:14px;justify-content:center">
+      <div class="pc-legend"><span><i class="pc-new"></i>read now · full price</span><span><i class="pc-hit"></i>reused from the cache · a small fraction of the price</span></div>
+      <div class="pc-axis"><span>start of the prompt</span><span>end</span></div>
+      <div class="pc-row">
+        <b>Question 1</b>
+        <div class="pc-bar"><span class="pc-new" style="flex:8">instructions + documents</span><span class="pc-new" style="flex:1.3">Q1</span></div>
+        <em class="pc-full">full price</em>
+        <p>The first time, the model reads everything. The provider keeps that work for a while.</p>
+      </div>
+      <div class="pc-row" data-step="1">
+        <b>Question 2</b>
+        <div class="pc-bar"><span class="pc-hit" style="flex:8">instructions + documents · not read again</span><span class="pc-new" style="flex:1.3">Q2</span></div>
+        <em class="pc-cheap">a fraction</em>
+        <p>The prompt starts exactly like the last one, so only the new question is read.</p>
+      </div>
+      <div class="pc-row" data-step="2">
+        <b>Question 3</b>
+        <div class="pc-bar"><span class="pc-new pc-chg" style="flex:1.2">date</span><span class="pc-new" style="flex:6.8">instructions + documents · read again</span><span class="pc-new" style="flex:1.3">Q3</span></div>
+        <em class="pc-full">full price again</em>
+        <p>Someone added today's date at the top. The prompt no longer starts the same, so nothing can be reused.</p>
+      </div>
+    </div>
+    <div class="col" style="justify-content:center">
+      <div class="card" data-step="3"><b>Keep the start identical.</b> <span class="small">Instructions and documents first, the question last. Anything that changes goes at the end.</span></div>
+      <div class="card" data-step="3"><b>It does not last.</b> <span class="small">The saved work is kept for minutes to hours, so it pays off when questions come often.</span></div>
+      <div class="card bad" data-step="4"><b>It saves money and time, not attention.</b> <span class="small">The model still looks across every document, so a detail buried in a huge prompt is as easy to miss as before. And the documents still have to fit in the window.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="lc-caches" data-part="8">
+  <div class="kicker"><b>8</b> · RAG vs long context · caching</div>
+  <h2>Four caches, four different jobs</h2>
+  <div class="cachegrid grow">
+    <div class="ch">&nbsp;</div><div class="ch">What is reused</div><div class="ch">What it saves</div><div class="ch">Helps</div>
+    <div class="cn" data-step="1"><b>KV cache</b><span>inside the model, during one answer</span></div>
+    <div data-step="1">The attention keys and values already computed for earlier tokens. Each new word reuses them instead of re-reading the whole prompt.</div>
+    <div data-step="1">Time per generated word. Always on; you never configure it.</div>
+    <div data-step="1"><span class="tag">both</span></div>
+    <div class="cn" data-step="2"><b>Prompt cache</b><span>at the provider, across requests</span></div>
+    <div data-step="2">That same KV state for an identical prompt prefix, kept between calls.</div>
+    <div data-step="2">Input cost and time to first word, when many questions share the same long prefix.</div>
+    <div data-step="2"><span class="tag work">long context</span></div>
+    <div class="cn" data-step="3"><b>Embeddings + index</b><span>in your system, built once</span></div>
+    <div data-step="3">The vector of every chunk. Documents are read once at indexing time, not on every question.</div>
+    <div data-step="3">Almost all document processing. Only changed documents are embedded again.</div>
+    <div data-step="3"><span class="tag hit">RAG</span></div>
+    <div class="cn" data-step="4"><b>Answer cache</b><span>in your system, across users</span></div>
+    <div data-step="4">A stored answer, returned when a new question is close enough in meaning to an earlier one (a semantic cache).</div>
+    <div data-step="4">The whole model call. Risky when answers must be fresh or personal.</div>
+    <div data-step="4"><span class="tag">both</span></div>
+  </div>
+  <p class="small" data-step="5">Put the first two together and you get <b>cache-augmented generation</b>: load a fixed set of documents into the model's cache once, then ask many questions with no retrieval step. It works while the documents are stable and fit in the window.</p>
+</section>
+
+<section class="slide" id="lc-calc" data-part="8">
+  <div class="kicker"><b>8</b> · RAG vs long context · play</div>
+  <h2>What does each question cost? Real prices, your scenario</h2>
+  <div class="demo split grow" style="grid-template-columns:1fr 1.3fr">
+    <div class="panel col" style="gap:12px">
+      <h3>Model (OpenAI list prices per 1M tokens)</h3>
+      <div class="chips" id="lc-models"></div>
+      <p class="mono" id="lc-rates" style="font-size:14.5px;line-height:1.6"></p>
+      <h3 style="margin-top:6px">Your scenario</h3>
+      <div class="controls"><label style="flex:1">documents <input type="range" id="lc-size" min="3.4" max="6.3" step="0.02" value="5.7"><output id="lc-size-o"></output></label></div>
+      <div class="controls"><label style="flex:1">questions <input type="range" id="lc-q" min="0" max="4" step="0.05" value="2.3"><output id="lc-q-o"></output></label></div>
+      <div class="controls"><label style="flex:1">RAG sends per question <input type="range" id="lc-rag" min="500" max="20000" step="500" value="3000"><output id="lc-rag-o"></output></label></div>
+    </div>
+    <div class="col" style="min-height:0;gap:10px">
+      <div class="panel"><h3>Input cost per question</h3><div id="lc-bars" style="margin-top:8px"></div></div>
+      <p><span class="verdict" id="lc-fit"></span></p>
+      <p id="lc-ratio" style="font-size:18px"></p>
+    </div>
+  </div>
+  <p class="small" style="font-size:14.5px">Prices: OpenAI API pricing page, Standard tier, read on 12 Nov 2026; check before presenting. A request with more than 272K input tokens is billed at 2× the input and cache rates. Left out: output tokens, the one-off cost of embedding the documents, hosting the index, and engineering time.</p>
+</section>
+
+<section class="slide" id="lc-bench" data-part="8">
+  <div class="kicker"><b>8</b> · RAG vs long context · measured</div>
+  <h2>A small benchmark: same documents, same model, two approaches</h2>
+  <div class="cols2 grow" style="align-items:start">
+    <div class="col">
+      <div class="card"><span class="tag">Documents</span><p style="font-size:19px">37 open-access papers in four nested collections: about 45K, 200K, 500K and 780K tokens.</p></div>
+      <div class="card work"><span class="tag work">Long context + prompt caching</span><p style="font-size:19px">Send the full collection with every question, keeping the document prefix identical so its processing can be reused.</p></div>
+      <div class="card hit"><span class="tag hit">RAG + answer caching</span><p style="font-size:19px">FAISS vector search fused with BM25, top six passages to the model. Reuse a stored answer when a new question is close enough to an earlier one.</p></div>
+    </div>
+    <div class="col">
+      <div class="card"><span class="tag">Workload</span><p style="font-size:19px">20 questions with reference answers, each asked three ways (original + two paraphrases): 60 queries per system, per collection size.</p></div>
+      <div class="card res"><span class="tag res">Measured</span><p style="font-size:19px"><b>Cost</b> per query · <b>Latency</b> (median) · <b>Quality</b>: correctness, faithfulness and relevance graded blind by a second model, plus whether the right page was cited.</p></div>
+      <div class="card" id="lc-results" data-step="1"><span class="tag">Results</span>
+        <img src="benchmark.png" alt="Benchmark results" style="max-width:100%;max-height:150px;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <p class="small" style="display:none">Add your results chart as <code>site/benchmark.png</code> and it appears here.</p></div>
+    </div>
+  </div>
+  <p class="small">Limits worth saying out loud: 20 underlying questions, one run, one model and provider, single-page lookups, an AI judge, API cost only.</p>
+</section>
+
+<section class="slide" id="lc-decide" data-part="8">
+  <div class="kicker"><b>8</b> · RAG vs long context</div>
+  <h2>So which one? Ask four questions about your problem</h2>
+  <div class="cols2" style="align-items:stretch">
+    <div class="card work" data-step="1"><span class="tag work">Lean to long context when</span>
+      <ul style="margin:6px 0 0;padding-left:22px;font-size:21px;line-height:1.55"><li>the documents are few and bounded (one contract, one book)</li><li>the question needs the whole text: summarise, compare, find what is missing</li><li>questions are rare, or the text is stable enough to cache</li></ul></div>
+    <div class="card hit" data-step="2"><span class="tag hit">Lean to RAG when</span>
+      <ul style="margin:6px 0 0;padding-left:22px;font-size:21px;line-height:1.55"><li>the data is larger than the window, or keeps growing</li><li>questions are lookups: one fact, one rule, one page</li><li>many people ask, all day: cost and waiting time add up</li><li>you must show the source of every answer</li></ul></div>
+  </div>
+  <div class="card res" data-step="3" style="margin-top:auto;font-size:23px">In practice it is often <b>both</b>: retrieve generously, then give a long-context model whole sections instead of tiny snippets. Retrieval decides <i>what</i> the model reads; the window decides <i>how much</i>.</div>
+</section>
+
+<!-- ======================= 9 · EVALUATION ======================= -->
+<section class="slide" id="ev-why" data-part="9">
+  <div class="kicker"><b>9</b> · Evaluation</div>
+  <h2>"It looks right" is not a measurement</h2>
+  <p class="lead" style="font-size:22px">You changed the chunk size. Is the system better or worse? Ragas scores a RAG from 0 to 1 on separate questions, so you can tell <b>which part</b> got better or worse.</p>
+  <div class="evalgrid grow">
+    <div class="ch">Metric</div><div class="ch">The question it answers</div><div class="ch">What it reads</div><div class="ch">Watches</div>
+    <div class="cn" data-step="1"><b>Context precision</b></div><div data-step="1">Are the useful chunks ranked above the useless ones?</div><div data-step="1" class="small">question · retrieved chunks · reference answer</div><div data-step="1"><span class="tag hit">retrieval</span></div>
+    <div class="cn" data-step="2"><b>Context recall</b></div><div data-step="2">Did we retrieve everything the right answer needs?</div><div data-step="2" class="small">retrieved chunks · reference answer</div><div data-step="2"><span class="tag hit">retrieval</span></div>
+    <div class="cn" data-step="3"><b>Faithfulness</b></div><div data-step="3">Is every claim in the answer backed by the retrieved chunks?</div><div data-step="3" class="small">answer · retrieved chunks</div><div data-step="3"><span class="tag res">generation</span></div>
+    <div class="cn" data-step="4"><b>Response relevancy</b></div><div data-step="4">Does the answer address the question that was asked, and only that?</div><div data-step="4" class="small">question · answer</div><div data-step="4"><span class="tag res">generation</span></div>
+    <div class="cn" data-step="5"><b>Answer accuracy</b></div><div data-step="5">Does the answer agree with the reference answer?</div><div data-step="5" class="small">question · answer · reference answer</div><div data-step="5"><span class="tag">end to end</span></div>
+  </div>
+  <p class="small" data-step="6">A <b>reference answer</b> is the correct answer written by a person. Three of the five metrics need one. An LLM acts as the judge for all five.</p>
+</section>
+
+<section class="slide" id="ev-bars" data-part="9" style="gap:11px">
+  <div class="kicker"><b>9</b> · Evaluation · play</div>
+  <h2>Drag a score. See what it means, and what to fix first.</h2>
+  <div class="chips" id="eb-presets"></div>
+  <div class="col grow" id="eb-rows" style="gap:9px;min-height:0"></div>
+  <div class="card" id="eb-head" style="font-size:18px;padding:11px 18px;transition:all .3s"></div>
+  <p class="small" style="font-size:14px">You set the levels; nothing here is measured. The pictures are sketches: four retrieved chunks, a four-sentence answer, four facts in the reference answer.</p>
+</section>
+
+<section class="slide" id="ev-code" data-part="9">
+  <div class="kicker"><b>9</b> · Evaluation · code</div>
+  <h2>Scoring your RAG with Ragas</h2>
+<pre class="code" data-hl="1:1-6;2:8-10;3:12-14;4:16-18" style="font-size:16.5px">
+from openai import AsyncOpenAI
+from ragas.llms import llm_factory
+from ragas.metrics.collections import Faithfulness, ContextRecall
+
+judge = llm_factory("gemma3:4b",                               # the judge: our own Ollama model
+    client=AsyncOpenAI(base_url="http://localhost:11434/v1", api_key="ollama"))
+
+results = hybrid_search(question, 3)                           # your pipeline from today
+contexts = [chunks[i]["text"] for i, _ in results]
+answer = rag(question)
+
+faith = await Faithfulness(llm=judge).ascore(
+    user_input=question, response=answer, retrieved_contexts=contexts)
+print(faith.value)                                             # 0 to 1
+
+recall = await ContextRecall(llm=judge).ascore(
+    user_input=question, retrieved_contexts=contexts,
+    reference="Yes, once, in the August resit period, capped at grade C.")
+</pre>
+  <div class="caps card" style="min-height:96px">
+    <p data-only="0" class="on">Press <kbd>→</kbd> to step through the code.</p>
+    <p data-only="1"><b>The judge.</b> Ragas needs an LLM to split answers into claims and check them. Ollama speaks the same protocol as OpenAI, so the model already running in your Colab can be the judge, with no API key. A small judge is lenient; a stronger one is more trustworthy.</p>
+    <p data-only="2"><b>Your system's output.</b> Ragas does not run your RAG. You hand it the question, the chunks you retrieved and the answer you generated.</p>
+    <p data-only="3"><b>Faithfulness</b> needs no reference answer, so it can run on real user questions.</p>
+    <p data-only="4"><b>Context recall</b> needs a reference answer. <span class="mono">ContextPrecision</span> and <span class="mono">AnswerAccuracy</span> follow the same pattern.</p>
+  </div>
+  <div class="banner"><span>▶ <b>Colab · Part 8</b> (optional) score three questions, then set <code>k=1</code> and watch which score falls</span><span class="time">take home</span></div>
+</section>
+
+<section class="slide" id="end" data-part="9" style="justify-content:center">
+  <div class="row" style="align-items:center;gap:60px">
+    <div class="col" style="flex:1;gap:22px">
+      <div class="kicker">Thank you</div>
+      <h1>Questions?</h1>
+      <p class="lead">You now have a working RAG in your Colab. Break it on purpose, then fix it: that is how the ideas stick.</p>
+      <p class="small">Press <kbd>O</kbd> to jump back to any slide or demo during questions.</p>
+    </div>
+    <div class="card col center" style="gap:10px;padding:22px 26px">
+      <svg viewBox="0 0 37 37" width="210" height="210" role="img" aria-label="QR code for linkedin.com/in/abdelrhman-elmoghazy"><rect width="37" height="37" fill="#fff"/><path d="M2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM13 2h1v1h-1zM14 2h1v1h-1zM16 2h1v1h-1zM17 2h1v1h-1zM20 2h1v1h-1zM21 2h1v1h-1zM23 2h1v1h-1zM24 2h1v1h-1zM25 2h1v1h-1zM28 2h1v1h-1zM29 2h1v1h-1zM30 2h1v1h-1zM31 2h1v1h-1zM32 2h1v1h-1zM33 2h1v1h-1zM34 2h1v1h-1zM2 3h1v1h-1zM8 3h1v1h-1zM14 3h1v1h-1zM17 3h1v1h-1zM19 3h1v1h-1zM23 3h1v1h-1zM24 3h1v1h-1zM25 3h1v1h-1zM28 3h1v1h-1zM34 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM12 4h1v1h-1zM13 4h1v1h-1zM16 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM28 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM34 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM17 5h1v1h-1zM19 5h1v1h-1zM24 5h1v1h-1zM28 5h1v1h-1zM30 5h1v1h-1zM31 5h1v1h-1zM32 5h1v1h-1zM34 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM15 6h1v1h-1zM18 6h1v1h-1zM21 6h1v1h-1zM23 6h1v1h-1zM25 6h1v1h-1zM28 6h1v1h-1zM30 6h1v1h-1zM31 6h1v1h-1zM32 6h1v1h-1zM34 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM11 7h1v1h-1zM13 7h1v1h-1zM16 7h1v1h-1zM19 7h1v1h-1zM22 7h1v1h-1zM23 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM34 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM31 8h1v1h-1zM32 8h1v1h-1zM33 8h1v1h-1zM34 8h1v1h-1zM11 9h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM23 9h1v1h-1zM26 9h1v1h-1zM2 10h1v1h-1zM5 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM21 10h1v1h-1zM23 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM29 10h1v1h-1zM2 11h1v1h-1zM5 11h1v1h-1zM6 11h1v1h-1zM10 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM18 11h1v1h-1zM23 11h1v1h-1zM26 11h1v1h-1zM27 11h1v1h-1zM28 11h1v1h-1zM29 11h1v1h-1zM34 11h1v1h-1zM4 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM18 12h1v1h-1zM19 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM26 12h1v1h-1zM29 12h1v1h-1zM30 12h1v1h-1zM32 12h1v1h-1zM34 12h1v1h-1zM3 13h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM6 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM23 13h1v1h-1zM24 13h1v1h-1zM25 13h1v1h-1zM26 13h1v1h-1zM28 13h1v1h-1zM30 13h1v1h-1zM31 13h1v1h-1zM33 13h1v1h-1zM34 13h1v1h-1zM3 14h1v1h-1zM7 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM14 14h1v1h-1zM17 14h1v1h-1zM21 14h1v1h-1zM23 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM27 14h1v1h-1zM28 14h1v1h-1zM31 14h1v1h-1zM33 14h1v1h-1zM2 15h1v1h-1zM6 15h1v1h-1zM7 15h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM26 15h1v1h-1zM28 15h1v1h-1zM29 15h1v1h-1zM30 15h1v1h-1zM31 15h1v1h-1zM33 15h1v1h-1zM34 15h1v1h-1zM3 16h1v1h-1zM4 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM16 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM31 16h1v1h-1zM33 16h1v1h-1zM3 17h1v1h-1zM4 17h1v1h-1zM6 17h1v1h-1zM10 17h1v1h-1zM11 17h1v1h-1zM15 17h1v1h-1zM17 17h1v1h-1zM19 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM23 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM30 17h1v1h-1zM33 17h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM9 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM16 18h1v1h-1zM19 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM23 18h1v1h-1zM24 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM28 18h1v1h-1zM30 18h1v1h-1zM33 18h1v1h-1zM2 19h1v1h-1zM9 19h1v1h-1zM10 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM16 19h1v1h-1zM25 19h1v1h-1zM29 19h1v1h-1zM31 19h1v1h-1zM33 19h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM27 20h1v1h-1zM28 20h1v1h-1zM32 20h1v1h-1zM33 20h1v1h-1zM34 20h1v1h-1zM3 21h1v1h-1zM5 21h1v1h-1zM6 21h1v1h-1zM10 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM29 21h1v1h-1zM33 21h1v1h-1zM2 22h1v1h-1zM3 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM21 22h1v1h-1zM23 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM33 22h1v1h-1zM3 23h1v1h-1zM6 23h1v1h-1zM7 23h1v1h-1zM9 23h1v1h-1zM10 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM21 23h1v1h-1zM22 23h1v1h-1zM24 23h1v1h-1zM26 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM32 23h1v1h-1zM33 23h1v1h-1zM34 23h1v1h-1zM2 24h1v1h-1zM3 24h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM15 24h1v1h-1zM17 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM28 24h1v1h-1zM29 24h1v1h-1zM32 24h1v1h-1zM34 24h1v1h-1zM3 25h1v1h-1zM4 25h1v1h-1zM5 25h1v1h-1zM6 25h1v1h-1zM9 25h1v1h-1zM11 25h1v1h-1zM12 25h1v1h-1zM15 25h1v1h-1zM16 25h1v1h-1zM18 25h1v1h-1zM20 25h1v1h-1zM23 25h1v1h-1zM24 25h1v1h-1zM26 25h1v1h-1zM29 25h1v1h-1zM31 25h1v1h-1zM34 25h1v1h-1zM2 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM16 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM25 26h1v1h-1zM26 26h1v1h-1zM27 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM34 26h1v1h-1zM10 27h1v1h-1zM11 27h1v1h-1zM12 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM21 27h1v1h-1zM22 27h1v1h-1zM24 27h1v1h-1zM26 27h1v1h-1zM30 27h1v1h-1zM31 27h1v1h-1zM34 27h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM16 28h1v1h-1zM24 28h1v1h-1zM26 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM31 28h1v1h-1zM32 28h1v1h-1zM33 28h1v1h-1zM2 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM11 29h1v1h-1zM12 29h1v1h-1zM14 29h1v1h-1zM17 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM23 29h1v1h-1zM24 29h1v1h-1zM26 29h1v1h-1zM30 29h1v1h-1zM33 29h1v1h-1zM2 30h1v1h-1zM4 30h1v1h-1zM5 30h1v1h-1zM6 30h1v1h-1zM8 30h1v1h-1zM12 30h1v1h-1zM13 30h1v1h-1zM14 30h1v1h-1zM16 30h1v1h-1zM17 30h1v1h-1zM18 30h1v1h-1zM21 30h1v1h-1zM22 30h1v1h-1zM23 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM34 30h1v1h-1zM2 31h1v1h-1zM4 31h1v1h-1zM5 31h1v1h-1zM6 31h1v1h-1zM8 31h1v1h-1zM10 31h1v1h-1zM11 31h1v1h-1zM12 31h1v1h-1zM14 31h1v1h-1zM17 31h1v1h-1zM19 31h1v1h-1zM21 31h1v1h-1zM22 31h1v1h-1zM23 31h1v1h-1zM25 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM30 31h1v1h-1zM31 31h1v1h-1zM32 31h1v1h-1zM2 32h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM8 32h1v1h-1zM11 32h1v1h-1zM12 32h1v1h-1zM14 32h1v1h-1zM16 32h1v1h-1zM19 32h1v1h-1zM25 32h1v1h-1zM26 32h1v1h-1zM27 32h1v1h-1zM30 32h1v1h-1zM31 32h1v1h-1zM32 32h1v1h-1zM34 32h1v1h-1zM2 33h1v1h-1zM8 33h1v1h-1zM13 33h1v1h-1zM14 33h1v1h-1zM17 33h1v1h-1zM18 33h1v1h-1zM19 33h1v1h-1zM20 33h1v1h-1zM21 33h1v1h-1zM22 33h1v1h-1zM23 33h1v1h-1zM25 33h1v1h-1zM26 33h1v1h-1zM27 33h1v1h-1zM28 33h1v1h-1zM2 34h1v1h-1zM3 34h1v1h-1zM4 34h1v1h-1zM5 34h1v1h-1zM6 34h1v1h-1zM7 34h1v1h-1zM8 34h1v1h-1zM10 34h1v1h-1zM11 34h1v1h-1zM15 34h1v1h-1zM16 34h1v1h-1zM18 34h1v1h-1zM21 34h1v1h-1zM23 34h1v1h-1zM26 34h1v1h-1zM30 34h1v1h-1zM31 34h1v1h-1zM33 34h1v1h-1z" fill="#111"/></svg>
+      <b style="font-size:22px">Abdelrhman ElMoghazy</b>
+      <span class="mono" style="font-size:15px">linkedin.com/in/abdelrhman-elmoghazy</span>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<button class="navbtn" id="prev" aria-label="Previous">‹</button>
+<button class="navbtn" id="next" aria-label="Next">›</button>
+<div id="bar">
+  <div id="parts"></div>
+  <button class="mini" id="speed" title="Animation speed">speed 1×</button>
+  <button class="mini" id="ovbtn" title="All slides (O)">slides</button>
+  <button class="mini" id="theme" title="Light or dark (T)">theme</button>
+  <span id="count"></span>
+</div>
+<div id="overview"></div>
+
+<script src="data.js?v=57935"></script>
+<script src="demos.js?v=57935"></script>
+<script src="deck.js?v=57935"></script>
+</body>
+</html>

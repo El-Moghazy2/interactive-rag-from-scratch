@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactive RAG from Scratch</title>
+<meta name="description" content="Learn retrieval-augmented generation from scratch with interactive visual demos and a Colab notebook. For beginners.">
+<style>
+  :root { --bg: #f4f1ea; --card: #fffdf8; --ink: #1d1c1a; --muted: #6d6a63; --line: #ddd7ca; --work: #e39a22; --hit: #14917f; --res: #6452d9; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0f1013; --card: #18191e; --ink: #ecebe6; --muted: #a09d95; --line: #33353d; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; }
+  main { max-width: 860px; margin: 0 auto; padding: 56px 20px 40px; }
+  .kicker { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  h1 { font-size: clamp(38px, 7vw, 64px); line-height: 1.05; margin: 10px 0 14px; letter-spacing: -.02em; }
+  .lead { font-size: 20px; color: var(--muted); max-width: 640px; margin: 0 0 8px; }
+  .rule { width: 64px; height: 5px; border-radius: 3px; background: var(--work); margin: 22px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 8px; }
+  a.card { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; color: inherit; text-decoration: none; transition: border-color .2s, transform .2s; }
+  a.card:hover { border-color: var(--ink); transform: translateY(-2px); }
+  a.card b { display: block; font-size: 20px; margin-bottom: 4px; }
+  a.card span { color: var(--muted); font-size: 15px; }
+  a.card i { display: inline-block; font-style: normal; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; border-radius: 99px; padding: 2px 10px; color: #fff; margin-bottom: 10px; }
+  .a i { background: var(--work); color: #1d1c1a; } .b i { background: var(--hit); } .c i { background: var(--res); }
+  ul { padding-left: 20px; color: var(--muted); } li { margin: 4px 0; } li b { color: var(--ink); }
+  footer { margin-top: 34px; font-size: 14px; color: var(--muted); } footer a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <div class="kicker">A workshop for beginners</div>
+  <h1>Interactive RAG<br>from Scratch</h1>
+  <p class="lead">Build your first "chat with your documents" system, one component at a time. Each part: watch it fail, play with a live demo, then run the code.</p>
+  <div class="rule"></div>
+  <div class="grid">
+    <a class="card a" href="https://colab.research.google.com/github/El-Moghazy2/interactive-rag-from-scratch/blob/main/notebooks/rag_workshop.ipynb"><i>Start here</i><b>Open in Colab</b><span>The complete notebook. Nothing to install: it runs in your browser on a free GPU.</span></a>
+    <a class="card b" href="site-short/"><i>90 minutes</i><b>The short deck</b><span>36 interactive slides with small toy examples.</span></a>
+    <a class="card c" href="site/"><i>Full version</i><b>The full deck</b><span>47 interactive slides on a real handbook, with quizzes.</span></a>
+  </div>
+  <h2 style="margin-top:34px">What you will build</h2>
+  <ul>
+    <li><b>Chunking:</b> fixed size, overlap and recursive splitting</li>
+    <li><b>Embeddings:</b> turning text into numbers that capture meaning</li>
+    <li><b>A vector index</b> with FAISS, and <b>keyword search</b> with BM25</li>
+    <li><b>Hybrid search:</b> fusing the two rankings</li>
+    <li><b>Generation:</b> a grounded prompt with citations, on a local model via Ollama</li>
+    <li><b>Evaluation</b> with Ragas, and when a long context window beats RAG</li>
+  </ul>
+  <footer>By Abdelrhman ElMoghazy · <a href="https://github.com/El-Moghazy2/interactive-rag-from-scratch">Source on GitHub</a> · The handbook in the examples belongs to a university that does not exist.</footer>
+</main>
+</body>
+</html>
