@@ -6,7 +6,7 @@ SITE = Path(__file__).resolve().parent.parent / "site"
 CK = ["#f3c766", "#6fcabb", "#9d90ee", "#ee8fa0"]          # chunk colours
 OP = [[.9, .3, .6, 1, .45, .75, .25], [.4, .95, .3, .6, .8, .2, .7],
       [.7, .5, 1, .25, .55, .9, .35], [.3, .65, .45, .85, 1, .5, .6]]
-TOP, BOT = 88, 300                                          # lane centre lines
+TOP, BOT = 108, 322                                          # lane centre lines
 TX = [84, 229, 374, 519]                                    # top lane centres
 BX = [92, 262, 519, 708, 904, 1064]                         # bottom lane centres
 
@@ -74,10 +74,10 @@ def band(x1, x2, y1, y2, cls, label):
 
 
 Y1, Y2 = BOT - 84, BOT + 100                                   # the bottom lane's box
-g.append(band(8, 596, TOP - 78, Y2, "ret", "RETRIEVAL"))      # retrieval holds both lanes
+g.append(band(8, 596, TOP - 98, Y2, "ret", "RETRIEVAL"))      # retrieval holds both lanes
 g.append(band(616, 800, Y1, Y2, "aug", "AUGMENTATION"))
 g.append(band(820, 1152, Y1, Y2, "gen", "GENERATION"))
-g.append(f'<text class="lane" x="130" y="{TOP - 54}">INDEXING · once, ahead of time</text>')
+g.append(f'<text class="lane" x="130" y="{TOP - 74}">INDEXING · once, ahead of time</text>')
 g.append(f'<path class="lanesplit" d="M24 {Y1 - 4}H580"/>')
 g.append(f'<text class="lane" x="24" y="{Y1 + 20}">SEARCH · for every question</text>')
 
@@ -128,12 +128,15 @@ ans = (bubble(cx, BOT - 4, "ab", w=124, h=62)
        + f'<rect x="{cx + 10}" y="{BOT - 4}" width="38" height="15" rx="4" fill="{CK[2]}"/><text class="cite" x="{cx + 29}" y="{BOT + 7}">[c20]</text>')
 g.append(f'<g class="stage final" data-at="6">{ans}{label(cx, BOT + 62, "Answer", "with its source")}</g>')
 
-svg = '<svg class="pipe" id="pipe-svg" viewBox="0 0 1160 410">\n      ' + "\n      ".join(g) + "\n    </svg>"
+svg = '<svg class="pipe" id="pipe-svg" viewBox="0 0 1160 432">\n      ' + "\n      ".join(g) + "\n    </svg>"
 
-html = (SITE / "index.html").read_text(encoding="utf-8")
-html, n = re.subn(r'<svg class="pipe" id="pipe-svg".*?</svg>', lambda m: svg, html, flags=re.S)
-assert n == 1
-(SITE / "index.html").write_text(html, encoding="utf-8")
+for deck, docs_label in [("site", "the handbook"), ("site-short", "our FAQ")]:   # both decks share this picture
+    f = SITE.parent / deck / "index.html"
+    html = f.read_text(encoding="utf-8")
+    html, n = re.subn(r'<svg class="pipe" id="pipe-svg".*?</svg>', lambda m: svg.replace(">the handbook<", f">{docs_label}<"), html, flags=re.S)
+    assert n == 1
+    html = re.sub(r'\?v=(\d+)"', lambda m: f'?v={int(m.group(1)) + 1}"', html)
+    f.write_text(html, encoding="utf-8")
 
 css = (SITE / "style.css").read_text(encoding="utf-8")
 if "/* pipeline pictograms */" not in css:
