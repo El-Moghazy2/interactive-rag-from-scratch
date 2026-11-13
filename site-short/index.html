@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chat with your Docs (90-minute version)</title>
-<link rel="stylesheet" href="style.css?v=5829">
+<link rel="stylesheet" href="style.css?v=5830">
 </head>
 <body>
 <div id="viewport"><div id="stage">
@@ -442,7 +442,7 @@ def rag(question, k=3):
       <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">The fact was split across two chunks. Split at paragraph boundaries or add overlap.</p></div>
     <div class="card quiz mini" data-answer="1"><p class="q"><b>Case 2.</b> "What is room B-204 used for?" → a confident answer about room B-240. The B-204 sentence is not among the retrieved chunks.</p>
       <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">The right chunk was never retrieved. Add keyword search and fuse the rankings.</p></div>
-    <div class="card quiz mini" data-answer="2"><p class="q"><b>Case 3.</b> "How much is a parking permit?" → "A permit costs 50 lumens per semester." The handbook has no parking section.</p>
+    <div class="card quiz mini" data-answer="2"><p class="q"><b>Case 3.</b> "How much is a parking permit?" → "A permit costs 50 dollars per semester." The handbook has no parking section.</p>
       <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">Nothing to retrieve, so the model filled the gap. Tell it to answer only from the context and to say when it does not know.</p></div>
   </div>
 </section>
@@ -595,8 +595,8 @@ def rag(question, k=3):
 </div>
 <div id="overview"></div>
 
-<script src="data.js?v=5829"></script>
-<script src="demos.js?v=5829"></script>
-<script src="deck.js?v=5829"></script>
+<script src="data.js?v=5830"></script>
+<script src="demos.js?v=5830"></script>
+<script src="deck.js?v=5830"></script>
 </body>
 </html>

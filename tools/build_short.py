@@ -31,7 +31,7 @@ CORPUS = [
     ("Exams", "If you are ill on exam day, send a medical note within five days."),
     ("Library", "The library is open from 8:00 to 23:00 on weekdays."),
     ("Library", "You can borrow up to eight books for three weeks."),
-    ("Library", "An overdue book costs 2 lumens per day."),
+    ("Library", "An overdue book costs 2 dollars per day."),
     ("Library", "Group study rooms can be booked for two hours a day."),
     ("Housing", "Quiet hours in the residences start at 22:30."),
     ("Housing", "One overnight visitor is allowed for up to three nights a month."),

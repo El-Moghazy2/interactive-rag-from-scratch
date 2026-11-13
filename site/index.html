@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chat with your Docs: build your first RAG</title>
-<link rel="stylesheet" href="style.css?v=57944">
+<link rel="stylesheet" href="style.css?v=57945">
 </head>
 <body>
 <div id="viewport"><div id="stage">
@@ -516,7 +516,7 @@ def rag(question, k=3):
       <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">The fact was split across two chunks. Split at paragraph boundaries or add overlap.</p></div>
     <div class="card quiz mini" data-answer="1"><p class="q"><b>Case 2.</b> "Which semester is CS-240 taught in?" → a confident answer about CS-204. The CS-240 chunk is not among the retrieved chunks.</p>
       <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">The right chunk was never retrieved. Add keyword search and fuse the rankings.</p></div>
-    <div class="card quiz mini" data-answer="2"><p class="q"><b>Case 3.</b> "How much is a parking permit?" → "A permit costs 50 lumens per semester." The handbook has no parking section.</p>
+    <div class="card quiz mini" data-answer="2"><p class="q"><b>Case 3.</b> "How much is a parking permit?" → "A permit costs 50 dollars per semester." The handbook has no parking section.</p>
       <div class="opts"><button>Chunking</button><button>Search</button><button>Prompt rules</button><button>Bigger LLM</button></div><p class="explain">Nothing to retrieve, so the model filled the gap. Tell it to answer only from the context and to say when it does not know.</p></div>
   </div>
 </section>
@@ -780,8 +780,8 @@ recall = await ContextRecall(llm=judge).ascore(
 </div>
 <div id="overview"></div>
 
-<script src="data.js?v=57944"></script>
-<script src="demos.js?v=57944"></script>
-<script src="deck.js?v=57944"></script>
+<script src="data.js?v=57945"></script>
+<script src="demos.js?v=57945"></script>
+<script src="deck.js?v=57945"></script>
 </body>
 </html>

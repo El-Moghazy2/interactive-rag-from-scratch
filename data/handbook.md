@@ -40,7 +40,7 @@ Moghazy University does not exist. This handbook was written for a RAG workshop,
 
 **Extensions.** A request for more time must be sent through the student portal at least 48 hours before the deadline, with supporting evidence such as a medical note. The course coordinator replies within two working days. The longest extension that can be granted is ten days.
 
-**Grade appeals.** A student who believes a mark is wrong may ask for a re-mark within 14 days of the result being published. The re-mark fee is 30 lumens and is refunded if the mark goes up. A re-mark can also lower the mark.
+**Grade appeals.** A student who believes a mark is wrong may ask for a re-mark within 14 days of the result being published. The re-mark fee is 30 dollars and is refunded if the mark goes up. A re-mark can also lower the mark.
 
 **Dean's list.** Students who finish a semester with a GPA of 3.7 or higher on at least 30 credits are placed on the Dean's list. The list is published in the second week of the following semester.
 
@@ -66,7 +66,7 @@ Moghazy University does not exist. This handbook was written for a RAG workshop,
 
 **Borrowing.** Undergraduate students may borrow up to eight books at a time for 21 days. A loan can be renewed twice online unless another reader has reserved the book. Reference books and journals cannot leave the building.
 
-**Overdue fines.** An overdue book costs 2 lumens per day, up to 40 lumens per book. A student who owes more than 50 lumens in fines cannot borrow or renew until the amount is paid.
+**Overdue fines.** An overdue book costs 2 dollars per day, up to 40 dollars per book. A student who owes more than 50 dollars in fines cannot borrow or renew until the amount is paid.
 
 **Opening hours.** The main library is open from 8:00 to 23:00 on weekdays and from 10:00 to 18:00 at weekends. During the assessment period it stays open 24 hours a day for students with a valid ID card.
 
@@ -82,15 +82,15 @@ Moghazy University does not exist. This handbook was written for a RAG workshop,
 
 **Kitchens and cleaning.** Shared kitchens are cleaned by staff once a week. Residents are expected to wash their own dishes on the day they use them. Items left in a shared fridge past the Friday clear-out are thrown away.
 
-**Moving out.** Rooms must be empty and keys returned by noon on the last day of the contract. A room left dirty or damaged is charged against the 200 lumen deposit. The rest of the deposit is returned within 30 days.
+**Moving out.** Rooms must be empty and keys returned by noon on the last day of the contract. A room left dirty or damaged is charged against the 200 dollar deposit. The rest of the deposit is returned within 30 days.
 
 ## Fees and Financial Aid
 
-**Tuition payment.** Tuition is paid per semester and is due by the end of week two. Students may pay in three instalments for a fee of 15 lumens. A student with unpaid tuition after week six loses access to the registration portal.
+**Tuition payment.** Tuition is paid per semester and is due by the end of week two. Students may pay in three instalments for a fee of 15 dollars. A student with unpaid tuition after week six loses access to the registration portal.
 
 **Merit scholarship.** The merit scholarship covers half of the tuition fee. To keep it, a student must complete at least 30 credits per semester and hold a cumulative GPA of 3.4 or higher. A student who falls below this gets one probation semester before the award is withdrawn.
 
-**Hardship fund.** Students facing an unexpected financial problem may apply to the hardship fund for a one-off grant of up to 500 lumens. Applications are reviewed every two weeks, and the decision is sent by email.
+**Hardship fund.** Students facing an unexpected financial problem may apply to the hardship fund for a one-off grant of up to 500 dollars. Applications are reviewed every two weeks, and the decision is sent by email.
 
 **Refunds.** A student who withdraws from the university before the end of week two gets a full tuition refund. Withdrawal during weeks three to six gives a 50 percent refund. No refund is given after week six.
 
@@ -98,7 +98,7 @@ Moghazy University does not exist. This handbook was written for a RAG workshop,
 
 **Accounts and passwords.** Every student gets a university account on the day they enrol. A forgotten password can be reset at the self-service page using the phone number on file, or in person at the IT help desk with an ID card. Passwords expire every 180 days.
 
-**Printing.** Each student receives a print credit of 300 pages per semester. Extra pages cost 0.1 lumens for black and white and 0.5 lumens for colour. Unused credit is not carried over to the next semester.
+**Printing.** Each student receives a print credit of 300 pages per semester. Extra pages cost 0.1 dollars for black and white and 0.5 dollars for colour. Unused credit is not carried over to the next semester.
 
 **Software and laptops.** Students can install the campus software bundle on one personal computer. The IT help desk lends laptops for up to seven days to students whose own device is being repaired.
 
@@ -112,8 +112,8 @@ Moghazy University does not exist. This handbook was written for a RAG workshop,
 
 ## Student Life
 
-**Clubs and societies.** Any group of at least 12 students can register a new club with the student union. Registered clubs receive a starting budget of 150 lumens and may book rooms for free. Club elections are held every March.
+**Clubs and societies.** Any group of at least 12 students can register a new club with the student union. Registered clubs receive a starting budget of 150 dollars and may book rooms for free. Club elections are held every March.
 
-**Sports facilities.** The sports hall and the gym are free for students on weekdays before 16:00. After 16:00 and at weekends, a session costs 3 lumens. The swimming pool needs a separate term pass.
+**Sports facilities.** The sports hall and the gym are free for students on weekdays before 16:00. After 16:00 and at weekends, a session costs 3 dollars. The swimming pool needs a separate term pass.
 
-**Student ID card.** The student ID card opens the library gates, residence doors and exam halls. A lost card must be reported to the registry on the same day. A replacement costs 10 lumens and is ready in two working days.
+**Student ID card.** The student ID card opens the library gates, residence doors and exam halls. A lost card must be reported to the registry on the same day. A replacement costs 10 dollars and is ready in two working days.
