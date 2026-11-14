@@ -1,4 +1,4 @@
-"""Rebuild the title slide of both decks: big title, one sentence, the speaker, a QR code for the notebook, one setup strip.
+"""Rebuild the title slide of both decks: big title, one sentence, the speaker, a QR code that opens the notebook in Colab, one setup strip.
 
 Usage: python tools/make_title.py   (safe to run again)
 """
@@ -9,7 +9,7 @@ import qrcode
 
 ROOT = Path(__file__).resolve().parent.parent
 NAME = "Abdelrhman ElMoghazy"
-NOTEBOOK = "https://github.com/El-Moghazy2/interactive-rag-from-scratch/blob/main/notebooks/rag_workshop.ipynb"
+NOTEBOOK = "https://colab.research.google.com/github/El-Moghazy2/interactive-rag-from-scratch/blob/main/notebooks/rag_workshop.ipynb"
 
 qr = qrcode.QRCode(border=2, error_correction=qrcode.constants.ERROR_CORRECT_M)
 qr.add_data(NOTEBOOK)
@@ -17,7 +17,7 @@ qr.make(fit=True)
 m = qr.get_matrix()
 n = len(m)
 d = "".join(f"M{x} {y}h1v1h-1z" for y, row in enumerate(m) for x, on in enumerate(row) if on)
-QR = (f'<svg viewBox="0 0 {n} {n}" width="190" height="190" role="img" aria-label="QR code for the workshop notebook on GitHub">'
+QR = (f'<svg viewBox="0 0 {n} {n}" width="190" height="190" role="img" aria-label="QR code that opens the workshop notebook in Google Colab">'
       f'<rect width="{n}" height="{n}" fill="#fff"/><path d="{d}" fill="#111"/></svg>')
 
 CSS = """
@@ -57,8 +57,8 @@ for deck, kicker, note in [
   </div>
   <div class="title-qr">
     {QR}
-    <b>Scan for the notebook</b>
-    <span>github.com/El-Moghazy2/<br>interactive-rag-from-scratch</span>
+    <b>Scan to open in Colab</b>
+    <span>the workshop notebook,<br>straight from GitHub</span>
   </div>
   </div>
   <div class="banner"><span>▶ <b>Do this now:</b> <b>el-moghazy2.github.io/interactive-rag-from-scratch</b> → Open in Colab → <b>T4 GPU</b> → run <b>0 · Setup</b></span><span class="time">2 min</span></div>
