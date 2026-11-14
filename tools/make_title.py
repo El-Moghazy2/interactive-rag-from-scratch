@@ -29,7 +29,7 @@ CSS = """
 .title-qr { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding: 16px 18px; background: var(--soft); border: 1px solid var(--line); border-radius: 14px; }
 .title-qr svg { border-radius: 8px; display: block; }
 .title-qr b { font-size: 19px; }
-.title-qr span { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.title-qr a { font-family: var(--mono); font-size: 12.5px; color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); line-height: 1.5; }
 .title-main .rule { width: 72px; height: 5px; border-radius: 3px; background: var(--work); }
 .speaker { font-size: 22px; color: var(--muted); }
 .speaker b { color: var(--ink); font-size: 26px; }
@@ -58,7 +58,7 @@ for deck, kicker, note in [
   <div class="title-qr">
     {QR}
     <b>Scan to open in Colab</b>
-    <span>the workshop notebook,<br>straight from GitHub</span>
+    <a href="https://github.com/El-Moghazy2/interactive-rag-from-scratch" target="_blank" rel="noopener">github.com/El-Moghazy2/<br>interactive-rag-from-scratch</a>
   </div>
   </div>
   <div class="banner"><span>▶ <b>Do this now:</b> <b>el-moghazy2.github.io/interactive-rag-from-scratch</b> → Open in Colab → <b>T4 GPU</b> → run <b>0 · Setup</b></span><span class="time">2 min</span></div>
