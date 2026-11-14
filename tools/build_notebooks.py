@@ -90,7 +90,8 @@ code('''
 MODEL = "gemma3:4b"   # no GPU? use "gemma3:1b" instead
 
 # every library is installed here, before anything is imported, so all versions match
-!pip -q install sentence-transformers faiss-cpu rank_bm25 pypdf ollama langchain-text-splitters ragas "langchain-community<0.4"
+!pip -q install sentence-transformers faiss-cpu rank_bm25 pypdf ollama langchain-text-splitters "langchain-community<0.4"
+!pip install ragas
 !sudo apt-get -qq install -y zstd pciutils > /dev/null 2>&1
 !curl -fsSL https://ollama.com/install.sh | sh > /dev/null 2>&1
 
