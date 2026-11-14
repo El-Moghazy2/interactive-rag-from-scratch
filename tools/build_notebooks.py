@@ -89,7 +89,8 @@ code('''
 #@title 0 · Setup: run me first (about 2 minutes)
 MODEL = "gemma3:4b"   # no GPU? use "gemma3:1b" instead
 
-!pip -q install sentence-transformers faiss-cpu rank_bm25 pypdf ollama langchain-text-splitters
+# every library is installed here, before anything is imported, so all versions match
+!pip -q install sentence-transformers faiss-cpu rank_bm25 pypdf ollama langchain-text-splitters ragas "langchain-community<0.4"
 !sudo apt-get -qq install -y zstd pciutils > /dev/null 2>&1
 !curl -fsSL https://ollama.com/install.sh | sh > /dev/null 2>&1
 
@@ -406,10 +407,6 @@ There are two ways to evaluate a RAG system:
 
 The judge here is the same Ollama model, reached through Ollama's OpenAI-compatible address, so no API key is needed. A stronger judge gives more trustworthy scores. A small one is lenient and sometimes wrong: read its scores as a signal, not a verdict.
 """)
-
-code('''
-!pip -q install ragas "langchain-community<0.4"
-''', colab_only=True)
 
 code('''
 # EVALUATION: the judge, and a tiny test set of questions with correct answers written by a person
