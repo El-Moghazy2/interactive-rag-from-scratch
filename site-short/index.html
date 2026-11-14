@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chat with your Docs (90-minute version)</title>
-<link rel="stylesheet" href="style.css?v=5831">
+<link rel="stylesheet" href="style.css?v=5832">
 </head>
 <body>
 <div id="viewport"><div id="stage">
@@ -166,7 +166,7 @@ pieces = make_splitter(200, 0).split_text(text)
     <p data-only="2"><b>Size and overlap.</b> The same two dials as in the first demo: the most characters a chunk may hold, and how much two neighbours repeat.</p>
     <p data-only="3"><b>The separators.</b> The list from the demo, from the biggest break to the smallest: blank line, line break, full stop, space, and finally "anywhere".</p>
     <p data-only="4"><b>Where the separator goes.</b> <span class="mono">"end"</span> keeps each full stop attached to the sentence before it, so chunks do not start with a stray dot.</p>
-    <p data-only="5"><b>Use it.</b> A list of strings comes back. In Part 7 your own PDF is cut with this function.</p>
+    <p data-only="5"><b>Use it.</b> A list of strings comes back. These strings are the chunks the rest of the pipeline uses.</p>
   </div>
   <div class="banner"><span>▶ <b>Colab · Part 2</b> <code>INDEXING</code> run the cells: load the PDF, then cut it into chunks</span><span class="time">4 min</span></div>
 </section>
@@ -457,7 +457,7 @@ def rag(question, k=3):
     <div class="card" style="flex:1"><b>Vector databases</b><br><span class="small">Chroma, Qdrant, pgvector: the same index, kept on disk.</span></div>
     <div class="card" style="flex:1"><b>Agentic search</b><br><span class="small">Let the model decide what to look up, and when.</span></div>
   </div>
-  <div class="banner"><span>▶ <b>Take home</b> Colab Part 7: chat with your own PDF · Part 8: score your RAG with Ragas</span><span class="time">after class</span></div>
+  <div class="banner"><span>▶ <b>Take home</b> Colab Part 7: chat with the handbook · Part 8: score your RAG with Ragas</span><span class="time">after class</span></div>
 </section>
 
 <!-- ======================= 8 · RAG VS LONG CONTEXT ======================= -->
@@ -595,8 +595,8 @@ def rag(question, k=3):
 </div>
 <div id="overview"></div>
 
-<script src="data.js?v=5831"></script>
-<script src="demos.js?v=5831"></script>
-<script src="deck.js?v=5831"></script>
+<script src="data.js?v=5832"></script>
+<script src="demos.js?v=5832"></script>
+<script src="deck.js?v=5832"></script>
 </body>
 </html>

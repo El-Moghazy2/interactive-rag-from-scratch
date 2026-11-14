@@ -47,7 +47,7 @@ Every component follows the same rhythm: **watch it fail → predict → play wi
 | Estimated time | about 110 minutes | about 90 minutes |
 | Demo data | the 47-chunk handbook, the same data as the notebook | a toy FAQ of 16 one-line facts in four topics (exams, library, housing, rooms) |
 | Numbers match Colab | yes | no: slides show the toy example, Colab uses the handbook |
-| Left out | nothing | quizzes, the index code slide, the PDF upload slide, the cache comparison, cost calculator and benchmark slides, the Ragas code slide |
+| Left out | nothing | quizzes, the index code slide, the chat slide, the cache comparison, cost calculator and benchmark slides, the Ragas code slide |
 
 Both use the same notebook. The notebook is complete: there are no blanks to fill in. Students run each part after its slides, read the code, and change values to see what happens. In the short version Parts 7 and 8 are take-home.
 
@@ -94,12 +94,12 @@ The demos work offline. The "type your own" button on the two search demos downl
 | 33–42 | 4 · Vector index | idx-why → idx-quiz | "We skip most vectors. Can that give a wrong answer?" Use *feeling stressed* with 1 cluster, then 2. | Part 4 (5 min) |
 | 42–55 | 5 · Hybrid search | hyb-why → hyb-quiz | "Which search wins on CS-240? Which on *retake an exam*?" Then drag the trust slider. | Part 5 (6 min) |
 | 55–68 | 6 · Generation | gen-why → gen-quiz | "The handbook has nothing on parking. What will the model say with no documents? With documents and rules?" | Part 6 (6 min) |
-| 68–78 | 7 · Your docs | clinic → recap | Three broken RAGs: which part do you fix? | Part 7: upload a PDF and chat (8 min) |
+| 68–78 | 7 · Your docs | clinic → recap | Three broken RAGs: which part do you fix? | Part 7: chat with the handbook (8 min) |
 | 78–90 | 8 · RAG vs long context | lc-question → end | "Our handbook fits in any prompt. Was today a waste?" | none |
 | extra | 9 · Evaluation with Ragas | ev-why → ev-code | "You changed the chunk size. Is the system better or worse?" On the bars slide, click *Faithful but wrong* and ask which part to fix. | Part 8 (optional) |
 | 90–120 | Questions | press `O` to jump back to any demo | | |
 
-If you run late: shorten Part 4 (show the demo, skip its code slide), and let Part 7's upload continue into the question time.
+If you run late: shorten Part 4 (show the demo, skip its code slide), and let Part 7's chat continue into the question time.
 
 ## Before the day
 
@@ -135,8 +135,8 @@ python -m venv .venv
 
 ## Design notes worth knowing when you present
 
-- Chunking is taught in three steps: the fixed-size demo (with overlap), the recursive-splitting demo, then the code. The recursive demo has Play and Step buttons and a maximum-size slider; it animates the rounds of LangChain's `RecursiveCharacterTextSplitter` on a three-paragraph passage. It is my own step-by-step version of the algorithm, checked in the page against the library's real output at every slider position (`RECDEMO.check()` in the browser console returns an empty list when they agree). The "recursive (LangChain)" mode in the first chunking demo shows the library's real output directly. The notebook has only the recursive splitter (`make_splitter`, 300 characters): fixed-size cutting stays on the slides. Every handbook paragraph is shorter than 300 characters, so the splitter cuts at blank lines and each rule is one chunk, with the same ids as on the slides; the student's own PDF in Part 7 goes through the same splitter.
-- The notebook is a complete prototype: chunks, embeddings, a FAISS vector index (`IndexFlatIP`, exact), a BM25 keyword index, rank fusion of the two, and generation. It holds only what the system uses, and every code cell starts with a comment naming its stage: `INDEXING` (load, chunk, embed, vector index, keyword index), `RETRIEVAL` (`semantic_search`, `keyword_search`, `hybrid_search`), `AUGMENTATION` (`build_prompt`), `GENERATION` (`ask_llm`, `rag`) and `EVALUATION`. Teaching-only pieces (a cosine function, fixed-size chunking, search by hand, the clustered index) live on the slides, not in the notebook. `build_index(path)` in Part 7 repeats the five indexing steps for any PDF.
+- Chunking is taught in three steps: the fixed-size demo (with overlap), the recursive-splitting demo, then the code. The recursive demo has Play and Step buttons and a maximum-size slider; it animates the rounds of LangChain's `RecursiveCharacterTextSplitter` on a three-paragraph passage. It is my own step-by-step version of the algorithm, checked in the page against the library's real output at every slider position (`RECDEMO.check()` in the browser console returns an empty list when they agree). The "recursive (LangChain)" mode in the first chunking demo shows the library's real output directly. The notebook has only the recursive splitter (`make_splitter`, 300 characters): fixed-size cutting stays on the slides. Every handbook paragraph is shorter than 300 characters, so the splitter cuts at blank lines and each rule is one chunk, with the same ids as on the slides.
+- The notebook is a complete prototype: chunks, embeddings, a FAISS vector index (`IndexFlatIP`, exact), a BM25 keyword index, rank fusion of the two, and generation. It holds only what the system uses, and every code cell starts with a comment naming its stage: `INDEXING` (load, chunk, embed, vector index, keyword index), `RETRIEVAL` (`semantic_search`, `keyword_search`, `hybrid_search`), `AUGMENTATION` (`build_prompt`), `GENERATION` (`ask_llm`, `rag`) and `EVALUATION`. Teaching-only pieces (a cosine function, fixed-size chunking, search by hand, the clustered index) live on the slides, not in the notebook. The notebook works on the handbook PDF only; there is no upload step.
 - The handbook is for "Moghazy University", which does not exist; its first paragraph says so and that every rule in it is invented. Money amounts are in dollars and are invented like everything else. The handbook is written in `data/handbook.md`, turned into `data/handbook.pdf` by `tools/build_pdf.py`, and the PDF is what the notebook and `tools/build_data.py` read, with the same few lines of code, so the 47 chunks on the slides are the 47 chunks in Colab.
 - The notebook reads like an article: why RAG and why not fine-tuning, then each component explained before its code, then evaluation and takeaways. Its nine figures are SVG files in `notebooks/figures/`, drawn by `tools/make_figures.py` from the handbook's real chunks, scores and rankings, and loaded by the notebook from the GitHub Pages address. Rerun that script if the handbook changes.
 - The overview picture groups the steps by component: Retrieval (indexing ahead of time, then search per question), Augmentation, Generation.

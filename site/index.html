@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chat with your Docs: build your first RAG</title>
-<link rel="stylesheet" href="style.css?v=57946">
+<link rel="stylesheet" href="style.css?v=57947">
 </head>
 <body>
 <div id="viewport"><div id="stage">
@@ -166,7 +166,7 @@ pieces = make_splitter(200, 0).split_text(text)
     <p data-only="2"><b>Size and overlap.</b> The same two dials as in the first demo: the most characters a chunk may hold, and how much two neighbours repeat.</p>
     <p data-only="3"><b>The separators.</b> The list from the demo, from the biggest break to the smallest: blank line, line break, full stop, space, and finally "anywhere".</p>
     <p data-only="4"><b>Where the separator goes.</b> <span class="mono">"end"</span> keeps each full stop attached to the sentence before it, so chunks do not start with a stray dot.</p>
-    <p data-only="5"><b>Use it.</b> A list of strings comes back. In Part 7 your own PDF is cut with this function.</p>
+    <p data-only="5"><b>Use it.</b> A list of strings comes back. These strings are the chunks the rest of the pipeline uses.</p>
   </div>
 </section>
 
@@ -523,14 +523,13 @@ def rag(question, k=3):
 
 <section class="slide" id="yours" data-part="7" style="justify-content:center">
   <div class="kicker"><b>7</b> · Your turn</div>
-  <h2>Now chat with your own document</h2>
+  <h2>Now chat with the handbook</h2>
   <ul class="big-list" style="margin:14px 0">
-    <li>Upload any text PDF: a course syllabus, lecture notes, a paper.</li>
-    <li>The notebook cuts it with the recursive splitter, embeds it and rebuilds both indexes.</li>
+    <li>Run the chat loop: every question goes through retrieve, augment, generate.</li>
     <li>Ask it three things: one easy, one with an exact name or number, one it cannot know.</li>
     <li>When an answer is wrong, print the retrieved chunks and name the broken part.</li>
   </ul>
-  <div class="banner"><span>▶ <b>Colab · Part 7</b> upload a PDF, run <code>build_index</code> on it and start the chat loop</span><span class="time">8 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 7</b> start the chat loop and ask the handbook your own questions</span><span class="time">8 min</span></div>
 </section>
 
 <section class="slide" id="recap" data-part="7">
@@ -780,8 +779,8 @@ recall = await ContextRecall(llm=judge).ascore(
 </div>
 <div id="overview"></div>
 
-<script src="data.js?v=57946"></script>
-<script src="demos.js?v=57946"></script>
-<script src="deck.js?v=57946"></script>
+<script src="data.js?v=57947"></script>
+<script src="demos.js?v=57947"></script>
+<script src="deck.js?v=57947"></script>
 </body>
 </html>

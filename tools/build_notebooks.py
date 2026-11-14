@@ -371,38 +371,14 @@ for q in ["Can I retake an exam I failed?",
 
 # ------------------------------------------------------------------ part 7
 md("""
-## Part 7 · Chat with *your* document (optional)
+## Part 7 · Chat with the handbook (optional)
 
-Look back at Figure 2: indexing is the only part that depends on the document. `build_index` runs its five steps again on any PDF, while retrieval, augmentation and generation stay exactly as they are.
+The pipeline is complete, so wrap it in a loop and ask your own questions. Try three: an easy one, one with an exact name or number, and one the handbook cannot know. When an answer is wrong, print `show(hybrid_search(q, 5))` and decide which part failed.
 """)
 
 code('''
-# INDEXING, all five steps in one function
-def build_index(path, strip_headings=True):
-    global document, chunks, texts, emb, index, bm25
-    document = load_pdf(path) if strip_headings else "\\n\\n".join(p.extract_text() or "" for p in PdfReader(path).pages)
-    chunks = [{"id": f"c{n + 1:02d}", "text": " ".join(t.split())} for n, t in enumerate(make_splitter().split_text(document))]
-    texts = [c["text"] for c in chunks]
-    emb = embedder.encode(texts, normalize_embeddings=True)
-    index = faiss.IndexFlatIP(emb.shape[1])
-    index.add(emb)
-    bm25 = BM25Okapi([tokenize(t) for t in texts])
-    print(path, "->", len(chunks), "chunks indexed")
-''')
-
-code('''
-from google.colab import files
-uploaded = files.upload()
-pdf_path = next(iter(uploaded))
-''', colab_only=True)
-
-code('''
-build_index(pdf_path, strip_headings=False)       # an arbitrary PDF: keep all of its text
-''')
-
-code('''
 while True:
-    q = input("Ask your document (empty line to stop): ")
+    q = input("Ask the handbook (empty line to stop): ")
     if not q.strip():
         break
     print(rag(q), "\\n")
@@ -442,8 +418,6 @@ from ragas.llms import llm_factory
 from ragas.metrics.collections import Faithfulness, ContextRecall, ContextPrecision, AnswerAccuracy
 
 judge = llm_factory(MODEL, client=AsyncOpenAI(base_url="http://localhost:11434/v1", api_key="ollama"))
-
-build_index("handbook.pdf")                       # back to the handbook, in case Part 7 replaced it
 
 tests = [
     ("Can I retake an exam I failed?",
@@ -508,7 +482,7 @@ md("""
 ## Where to go next
 
 - **Something wrong?** Print `show(hybrid_search(q, 5))` first. If the right chunk is not there, it is an indexing or retrieval problem. If it is there, it is an augmentation or generation problem.
-- **Experiment:** change `make_splitter(size, overlap)` and call `build_index("handbook.pdf")` again, or change `k` in `rag`.
+- **Experiment:** change `make_splitter(size, overlap)` and run the indexing cells again (Parts 2 to 5), or change `k` in `rag`.
 - **Reranking:** retrieve 20 chunks, then let a stronger model pick the best 3.
 - **Bigger collections:** keep the vectors in a vector database (Chroma, Qdrant, pgvector) instead of in memory.
 """)

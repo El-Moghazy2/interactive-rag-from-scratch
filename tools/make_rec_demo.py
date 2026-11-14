@@ -47,7 +47,7 @@ pieces = make_splitter(200, 0).split_text(text)
     <p data-only="2"><b>Size and overlap.</b> The same two dials as in the first demo: the most characters a chunk may hold, and how much two neighbours repeat.</p>
     <p data-only="3"><b>The separators.</b> The list from the demo, from the biggest break to the smallest: blank line, line break, full stop, space, and finally "anywhere".</p>
     <p data-only="4"><b>Where the separator goes.</b> <span class="mono">"end"</span> keeps each full stop attached to the sentence before it, so chunks do not start with a stray dot.</p>
-    <p data-only="5"><b>Use it.</b> A list of strings comes back. In Part 7 your own PDF is cut with this function.</p>
+    <p data-only="5"><b>Use it.</b> A list of strings comes back. These strings are the chunks the rest of the pipeline uses.</p>
   </div>__BANNER__
 </section>'''
 
