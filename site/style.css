@@ -394,8 +394,13 @@ input.ebar::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; ba
 
 /* title slide */
 .title-main { display: flex; flex-direction: column; justify-content: center; gap: 22px; flex: 1; min-height: 0; }
-.title-main h1 { font-size: 104px; white-space: nowrap; }
-.title-main .lead { font-size: 26px; max-width: none; white-space: nowrap; }
+.title-row { display: flex; align-items: center; gap: 44px; flex: 1; min-height: 0; }
+.title-main h1 { font-size: 88px; white-space: nowrap; }
+.title-main .lead { font-size: 26px; max-width: none; }
+.title-qr { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding: 16px 18px; background: var(--soft); border: 1px solid var(--line); border-radius: 14px; }
+.title-qr svg { border-radius: 8px; display: block; }
+.title-qr b { font-size: 19px; }
+.title-qr span { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
 .title-main .rule { width: 72px; height: 5px; border-radius: 3px; background: var(--work); }
 .speaker { font-size: 22px; color: var(--muted); }
 .speaker b { color: var(--ink); font-size: 26px; }
