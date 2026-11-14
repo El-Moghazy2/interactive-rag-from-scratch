@@ -51,7 +51,7 @@ pieces = make_splitter(200, 0).split_text(text)
   </div>__BANNER__
 </section>'''
 
-BANNER = '\n  <div class="banner"><span>▶ <b>Colab · Part 2</b> run the cells: fixed size first, then the recursive splitter, then build the chunks</span><span class="time">4 min</span></div>'
+BANNER = '\n  <div class="banner"><span>▶ <b>Colab · Part 2</b> <code>INDEXING</code> run the cells: load the PDF, then cut it into chunks</span><span class="time">4 min</span></div>'
 
 CSS = """
 /* recursive splitting demo */
@@ -197,7 +197,7 @@ for deck in ["site", "site-short"]:
     s = s[:a] + CODE_SLIDE.replace("__BANNER__", BANNER if short else "") + s[b:]
     if not short:   # the full deck carries its Colab banner on the quiz slide
         s = re.sub(r'(<b>Colab · Part 2</b>) [^<]*<code>step</code>.*?(</span><span class="time">)',
-                   r'\1 run the cells: fixed size first, then the recursive splitter, then build the chunks\2', s, flags=re.S)
+                   r'\1 <code>INDEXING</code> run the cells: load the PDF, then cut it into chunks\2', s, flags=re.S)
     s = re.sub(r'\?v=(\d+)"', lambda m: f'?v={int(m.group(1)) + 1}"', s)
     p.write_text(s, encoding="utf-8")
 

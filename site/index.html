@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chat with your Docs: build your first RAG</title>
-<link rel="stylesheet" href="style.css?v=57945">
+<link rel="stylesheet" href="style.css?v=57946">
 </head>
 <body>
 <div id="viewport"><div id="stage">
@@ -99,7 +99,7 @@
     <li>Compare the two answers with your neighbour's. Did the first ones even agree?</li>
   </ul>
   <p class="lead">Pasting by hand works for one question. The rest of today is about finding the right paragraph automatically.</p>
-  <div class="banner"><span>▶ <b>Colab · Part 1</b> run the two cells and compare the answers</span><span class="time">3 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 1</b> <code>GENERATION</code> run the cell: the model answers with no documents</span><span class="time">3 min</span></div>
 </section>
 
 <!-- ======================= 2 · CHUNKING ======================= -->
@@ -178,7 +178,7 @@ pieces = make_splitter(200, 0).split_text(text)
     <div class="opts"><button>Even bigger chunks</button><button>Smaller chunks, split at paragraph boundaries</button><button>A bigger language model</button><button>Remove the overlap</button></div>
     <p class="explain">A big chunk carries several topics at once, so it matches many questions weakly and fills the prompt with noise. Chunks that hold one idea each are easier to find and easier to use.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 2</b> run the cells: fixed size first, then the recursive splitter, then build the chunks</span><span class="time">5 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 2</b> <code>INDEXING</code> run the cells: load the PDF, then cut it into chunks</span><span class="time">5 min</span></div>
 </section>
 
 <!-- ======================= 3 · EMBEDDINGS ======================= -->
@@ -268,7 +268,7 @@ emb.shape                                              # (47, 384)
     <div class="opts"><button>They share 90% of their words</button><button>One is the correct answer to the other</button><button>The model places their meanings very close together</button><button>They are about the same length</button></div>
     <p class="explain">Similarity is about meaning as the model sees it. It says nothing about shared words, length or truth: a question and a wrong answer on the same topic also score high. That is why generation still has to read carefully.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 3</b> run the cells: one embedding, cosine similarity, then embed every chunk</span><span class="time">5 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 3</b> <code>INDEXING</code> run the cell: embed every chunk</span><span class="time">5 min</span></div>
 </section>
 
 <!-- ======================= 4 · INDEX ======================= -->
@@ -359,7 +359,7 @@ ivf.nprobe = 2                                 # clusters to open per question
     <div class="opts"><button>Open more clusters per question (raise nprobe)</button><button>Embed all documents again</button><button>Use a bigger language model</button><button>Make the chunks smaller</button></div>
     <p class="explain">An index trades a little accuracy for a lot of speed, and nprobe is the dial. Nothing has to be rebuilt. With all clusters open you are back to exact search.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 4</b> run the cells: build the index, search it, then try the clustered index</span><span class="time">5 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 4</b> run the cells: build the vector index (<code>INDEXING</code>), then search it (<code>RETRIEVAL</code>)</span><span class="time">5 min</span></div>
 </section>
 
 <!-- ======================= 5 · HYBRID ======================= -->
@@ -427,7 +427,7 @@ def rrf(rankings, k=60):
     <div class="opts"><button>Semantic only: it understands meaning</button><button>Hybrid: keywords catch the codes, embeddings catch the paraphrases</button><button>Keyword only: it is exact</button><button>No retrieval, a bigger model will know</button></div>
     <p class="explain">Each method fails on the other's strength. Fusing the two rankings costs a few lines and covers both kinds of question.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 5</b> run the cells and compare keyword, semantic and hybrid search</span><span class="time">6 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 5</b> run the cells: keyword index (<code>INDEXING</code>), keyword and hybrid search (<code>RETRIEVAL</code>)</span><span class="time">6 min</span></div>
 </section>
 
 <!-- ======================= 6 · GENERATION ======================= -->
@@ -504,7 +504,7 @@ def rag(question, k=3):
     <div class="opts"><button>Chunking</button><button>The embedding model</button><button>The vector index</button><button>Generation: the prompt or the model</button></div>
     <p class="explain">Always look at the retrieved chunks first. Right chunk present: fix the prompt or the model. Right chunk missing: fix chunking or search. This one habit solves most RAG bugs.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 6</b> run the cells: build the prompt, then ask all four questions</span><span class="time">6 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 6</b> run the cells: build the prompt (<code>AUGMENTATION</code>), then ask all four questions (<code>GENERATION</code>)</span><span class="time">6 min</span></div>
 </section>
 
 <!-- ======================= 7 · YOUR DOCS ======================= -->
@@ -530,7 +530,7 @@ def rag(question, k=3):
     <li>Ask it three things: one easy, one with an exact name or number, one it cannot know.</li>
     <li>When an answer is wrong, print the retrieved chunks and name the broken part.</li>
   </ul>
-  <div class="banner"><span>▶ <b>Colab · Part 7</b> upload a PDF and start the chat loop</span><span class="time">8 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 7</b> upload a PDF, run <code>build_index</code> on it and start the chat loop</span><span class="time">8 min</span></div>
 </section>
 
 <section class="slide" id="recap" data-part="7">
@@ -780,8 +780,8 @@ recall = await ContextRecall(llm=judge).ascore(
 </div>
 <div id="overview"></div>
 
-<script src="data.js?v=57945"></script>
-<script src="demos.js?v=57945"></script>
-<script src="deck.js?v=57945"></script>
+<script src="data.js?v=57946"></script>
+<script src="demos.js?v=57946"></script>
+<script src="deck.js?v=57946"></script>
 </body>
 </html>

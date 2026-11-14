@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chat with your Docs (90-minute version)</title>
-<link rel="stylesheet" href="style.css?v=5830">
+<link rel="stylesheet" href="style.css?v=5831">
 </head>
 <body>
 <div id="viewport"><div id="stage">
@@ -99,7 +99,7 @@
     <li>Compare the two answers with your neighbour's. Did the first ones even agree?</li>
   </ul>
   <p class="lead">Pasting by hand works for one question. The rest of today is about finding the right paragraph automatically.</p>
-  <div class="banner"><span>▶ <b>Colab · Part 1</b> run the two cells and compare the answers</span><span class="time">3 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 1</b> <code>GENERATION</code> run the cell: the model answers with no documents</span><span class="time">3 min</span></div>
 </section>
 
 <!-- ======================= 2 · CHUNKING ======================= -->
@@ -168,7 +168,7 @@ pieces = make_splitter(200, 0).split_text(text)
     <p data-only="4"><b>Where the separator goes.</b> <span class="mono">"end"</span> keeps each full stop attached to the sentence before it, so chunks do not start with a stray dot.</p>
     <p data-only="5"><b>Use it.</b> A list of strings comes back. In Part 7 your own PDF is cut with this function.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 2</b> run the cells: fixed size first, then the recursive splitter, then build the chunks</span><span class="time">4 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 2</b> <code>INDEXING</code> run the cells: load the PDF, then cut it into chunks</span><span class="time">4 min</span></div>
 </section>
 
 <!-- ======================= 3 · EMBEDDINGS ======================= -->
@@ -248,7 +248,7 @@ emb.shape                                              # (47, 384)
     <p data-only="2"><b>Cosine similarity.</b> The dot product <span class="mono">a @ b</span> divided by both lengths <span class="mono">np.linalg.norm(a)</span>, <span class="mono">np.linalg.norm(b)</span>.</p>
     <p data-only="3"><b>Embed every chunk once.</b> One row per chunk. <span class="mono">normalize_embeddings=True</span> makes every length 1, so from here on cosine similarity is a plain dot product. That is what the vector index in the next part computes.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 3</b> run the cells: one embedding, cosine similarity, then embed every chunk</span><span class="time">4 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 3</b> <code>INDEXING</code> run the cell: embed every chunk</span><span class="time">4 min</span></div>
 </section>
 
 <!-- ======================= 4 · INDEX ======================= -->
@@ -305,7 +305,7 @@ scores, ids = index.search(q, 3)         # ask for the 3 chunks nearest to the q
 </pre>
     <p class="small">A vector database (Chroma, Qdrant, pgvector) is an index like these, plus storage on disk, filters and updates.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 4</b> run the cells: build the index, search it, then try the clustered index</span><span class="time">2 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 4</b> run the cells: build the vector index (<code>INDEXING</code>), then search it (<code>RETRIEVAL</code>)</span><span class="time">2 min</span></div>
 </section>
 
 <!-- ======================= 5 · HYBRID ======================= -->
@@ -363,7 +363,7 @@ def rrf(rankings, k=60):
     <p data-only="3"><b>Reciprocal rank fusion.</b> Position 1 earns 1/61, position 2 earns 1/62, and so on. A chunk that is near the top of both lists collects the most points.</p>
     <p data-only="4"><b>Sort by points.</b> That is the whole algorithm, and it is what many production search systems use.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 5</b> run the cells and compare keyword, semantic and hybrid search</span><span class="time">5 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 5</b> run the cells: keyword index (<code>INDEXING</code>), keyword and hybrid search (<code>RETRIEVAL</code>)</span><span class="time">5 min</span></div>
 </section>
 
 <!-- ======================= 6 · GENERATION ======================= -->
@@ -430,7 +430,7 @@ def rag(question, k=3):
     <p data-only="3"><b>The open book and the question.</b> This is the "augmented" in RAG: plain text pasted into a prompt.</p>
     <p data-only="4"><b>Three lines for the whole system:</b> retrieve, augment, generate.</p>
   </div>
-  <div class="banner"><span>▶ <b>Colab · Part 6</b> run the cells: build the prompt, then ask all four questions</span><span class="time">5 min</span></div>
+  <div class="banner"><span>▶ <b>Colab · Part 6</b> run the cells: build the prompt (<code>AUGMENTATION</code>), then ask all four questions (<code>GENERATION</code>)</span><span class="time">5 min</span></div>
 </section>
 
 <!-- ======================= 7 · YOUR DOCS ======================= -->
@@ -595,8 +595,8 @@ def rag(question, k=3):
 </div>
 <div id="overview"></div>
 
-<script src="data.js?v=5830"></script>
-<script src="demos.js?v=5830"></script>
-<script src="deck.js?v=5830"></script>
+<script src="data.js?v=5831"></script>
+<script src="demos.js?v=5831"></script>
+<script src="deck.js?v=5831"></script>
 </body>
 </html>

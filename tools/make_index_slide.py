@@ -89,7 +89,7 @@ CSS = """
 .ixpic .ix-q { fill: var(--bad); stroke: var(--soft); stroke-width: 1.5; }
 """
 
-BANNER = '\n  <div class="banner"><span>▶ <b>Colab · Part 4</b> run the cells: build the index, search it, then try the clustered index</span><span class="time">2 min</span></div>'
+BANNER = '\n  <div class="banner"><span>▶ <b>Colab · Part 4</b> run the cells: build the vector index (<code>INDEXING</code>), then search it (<code>RETRIEVAL</code>)</span><span class="time">2 min</span></div>'
 
 
 def section(s, sid):
@@ -118,7 +118,7 @@ for deck in ["site", "site-short"]:
         s = s[:a] + CODE + s[b:]
         old = "fill in <code>top</code> in <code>semantic_search</code>, then run the FAISS cell"
         if old in s:
-            s = s.replace(old, "run the cells: build the index, search it, then try the clustered index")
+            s = s.replace(old, "run the cells: build the vector index (<code>INDEXING</code>), then search it (<code>RETRIEVAL</code>)")
     s = re.sub(r'\?v=(\d+)"', lambda m: f'?v={int(m.group(1)) + 1}"', s)
     p.write_text(s, encoding="utf-8")
     c = ROOT / deck / "style.css"
